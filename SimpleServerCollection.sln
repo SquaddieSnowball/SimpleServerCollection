@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleTcpServer", "SimpleTcpServer\SimpleTcpServer.csproj", "{5F2C9DB5-1162-4C81-B611-428164A1C909}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleTcpServer", "SimpleTcpServer\SimpleTcpServer.csproj", "{5F2C9DB5-1162-4C81-B611-428164A1C909}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleHttpServer", "SimpleHttpServer\SimpleHttpServer.csproj", "{30784551-2A71-4844-9537-0EABDB30546F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{5F2C9DB5-1162-4C81-B611-428164A1C909}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F2C9DB5-1162-4C81-B611-428164A1C909}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F2C9DB5-1162-4C81-B611-428164A1C909}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30784551-2A71-4844-9537-0EABDB30546F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30784551-2A71-4844-9537-0EABDB30546F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30784551-2A71-4844-9537-0EABDB30546F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30784551-2A71-4844-9537-0EABDB30546F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
