@@ -6,17 +6,35 @@ using System.Net;
 
 namespace SimpleHttpServer;
 
+/// <summary>
+/// Runs a server that listens for incoming HTTP requests.
+/// </summary>
 public sealed class HttpServer
 {
     private readonly TcpServer _tcpServer;
     private readonly Dictionary<string, Action<HttpRequest, HttpResponse>> _endpoints = new();
 
+    /// <summary>
+    /// An IPAddress that represents the local IP address.
+    /// </summary>
     public IPAddress IpAddress { get; }
 
+    /// <summary>
+    /// The port on which to listen for request.
+    /// </summary>
     public int Port { get; }
 
+    /// <summary>
+    /// Maximum HTTP protocol version supported by the server.
+    /// </summary>
     public string ProtocolVersion { get; } = "1.2";
 
+    /// <summary>
+    /// Initializes a new instance of the HttpServer class that runs a HTTP server
+    /// which listens for HTTP requests on the specified local IP address and port number.
+    /// </summary>
+    /// <param name="ipAddress">An IPAddress that represents the local IP address.</param>
+    /// <param name="port">The port on which to listen for request.</param>
     public HttpServer(IPAddress ipAddress, int port)
     {
         (IpAddress, Port) = (ipAddress, port);
@@ -27,6 +45,9 @@ public sealed class HttpServer
         };
     }
 
+    /// <summary>
+    /// Starts the server.
+    /// </summary>
     public void Start()
     {
         try
@@ -39,8 +60,19 @@ public sealed class HttpServer
         }
     }
 
+    /// <summary>
+    /// Stops the server.
+    /// </summary>
     public void Stop() => _tcpServer?.Stop();
 
+    /// <summary>
+    /// Adds an endpoint and it's handler to the HTTP server.
+    /// </summary>
+    /// <param name="target">Endpoint to add to the HTTP server.</param>
+    /// <param name="handler">Endpoint handler.</param>
+    /// <returns>The current instance of the HttpServer class.</returns>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="ArgumentNullException"></exception>
     public HttpServer AddEndpoint(string target, Action<HttpRequest, HttpResponse> handler)
     {
         if (string.IsNullOrEmpty(target) is true)
