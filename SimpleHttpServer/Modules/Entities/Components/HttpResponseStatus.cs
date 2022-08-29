@@ -1,5 +1,8 @@
 ﻿namespace SimpleHttpServer.Modules.Entities.Components;
 
+/// <summary>
+/// Represents the status of an HTTP response.
+/// </summary>
 public enum HttpResponseStatus
 {
     Continue = 100,
