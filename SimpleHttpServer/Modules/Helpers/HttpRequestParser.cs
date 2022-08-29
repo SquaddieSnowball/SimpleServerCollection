@@ -5,12 +5,22 @@ using System.Text.RegularExpressions;
 
 namespace SimpleHttpServer.Modules.Helpers;
 
+/// <summary>
+/// Provides methods used to parse HTTP requests.
+/// </summary>
 internal sealed class HttpRequestParser
 {
     private const string StartLinePattern = @"^(?<method>\w+)\s(?<target>.+)\sHTTP/(?<protocolVersion>\d(.\d)*)$";
     private const string QueryParameterPattern = @"^(?<parameter>.+)=(?<value>.+)$";
     private const string HeaderPattern = @"^(?<parameter>.+):\s(?<value>.+)$";
 
+    /// <summary>
+    /// Parses an HTTP request from a sequence of bytes.
+    /// </summary>
+    /// <param name="request">Sequence of bytes containing the HTTP request.</param>
+    /// <returns>New instance of the HttpRequest class.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="ArgumentException"></exception>
     internal static HttpRequest ParseFromBytes(IEnumerable<byte> request)
     {
         if (request is null)

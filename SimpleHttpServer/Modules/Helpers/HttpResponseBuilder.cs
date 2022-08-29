@@ -4,8 +4,17 @@ using System.Text;
 
 namespace SimpleHttpServer.Modules.Helpers;
 
+/// <summary>
+/// Provides methods used to build HTTP responses.
+/// </summary>
 internal sealed class HttpResponseBuilder
 {
+    /// <summary>
+    /// Creates an HTTP response from an instance of the HttpResponse class.
+    /// </summary>
+    /// <param name="response">An instance of the HttpResponse class.</param>
+    /// <returns>Sequence of bytes containing the HTTP response.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
     internal static IEnumerable<byte> Build(HttpResponse response)
     {
         if (response is null)
