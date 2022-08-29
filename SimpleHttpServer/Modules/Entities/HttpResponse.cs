@@ -8,22 +8,22 @@ namespace SimpleHttpServer.Modules.Entities;
 public sealed class HttpResponse
 {
     /// <summary>
-    /// Protocol version of an HTTP response.
+    /// Gets or sets protocol version of an HTTP response.
     /// </summary>
     public string ProtocolVersion { get; set; }
 
     /// <summary>
-    /// Status of an HTTP response.
+    /// Gets or sets status of an HTTP response.
     /// </summary>
     public HttpResponseStatus Status { get; set; }
 
     /// <summary>
-    /// Headers of an HTTP response.
+    /// Gets or sets headers of an HTTP response.
     /// </summary>
     public IEnumerable<HttpHeader> Headers { get; set; }
 
     /// <summary>
-    /// Body of an HTTP response.
+    /// Gets or sets body of an HTTP response.
     /// </summary>
     public string Body { get; set; }
 

@@ -8,32 +8,32 @@ namespace SimpleHttpServer.Modules.Entities;
 public sealed class HttpRequest
 {
     /// <summary>
-    /// Method of an HTTP request.
+    /// Gets method of an HTTP request.
     /// </summary>
     public HttpRequestMethod Method { get; }
 
     /// <summary>
-    /// Target of an HTTP request.
+    /// Gets target of an HTTP request.
     /// </summary>
     public string Target { get; }
 
     /// <summary>
-    /// Query parameters of an HTTP request.
+    /// Gets query parameters of an HTTP request.
     /// </summary>
     public IEnumerable<HttpRequestQueryParameter> QueryParameters { get; }
 
     /// <summary>
-    /// Protocol version of an HTTP request.
+    /// Gets protocol version of an HTTP request.
     /// </summary>
     public string ProtocolVersion { get; }
 
     /// <summary>
-    /// Headers of an HTTP request.
+    /// Gets headers of an HTTP request.
     /// </summary>
     public IEnumerable<HttpHeader> Headers { get; }
 
     /// <summary>
-    /// Body of an HTTP request.
+    /// Gets body of an HTTP request.
     /// </summary>
     public string Body { get; }
 

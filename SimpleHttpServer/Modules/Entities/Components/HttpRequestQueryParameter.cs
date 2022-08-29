@@ -6,12 +6,12 @@
 public sealed class HttpRequestQueryParameter
 {
     /// <summary>
-    /// Parameter name of an HTTP request query parameter.
+    /// Gets parameter name of an HTTP request query parameter.
     /// </summary>
     public string Parameter { get; }
 
     /// <summary>
-    /// Value of an HTTP request query parameter.
+    /// Gets value of an HTTP request query parameter.
     /// </summary>
     public string Value { get; }
 

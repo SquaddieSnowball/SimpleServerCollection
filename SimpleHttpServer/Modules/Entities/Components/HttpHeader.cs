@@ -6,17 +6,17 @@
 public sealed class HttpHeader
 {
     /// <summary>
-    /// Group of an HTTP header.
+    /// Gets group of an HTTP header.
     /// </summary>
     public HttpHeaderGroup Group { get; }
 
     /// <summary>
-    /// Parameter of an HTTP header.
+    /// Gets parameter of an HTTP header.
     /// </summary>
     public string Parameter { get; }
 
     /// <summary>
-    /// Value of an HTTP header.
+    /// Gets value of an HTTP header.
     /// </summary>
     public string Value { get; }
 

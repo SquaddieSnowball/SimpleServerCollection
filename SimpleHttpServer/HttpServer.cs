@@ -15,17 +15,17 @@ public sealed class HttpServer
     private readonly Dictionary<string, Action<HttpRequest, HttpResponse>> _endpoints = new();
 
     /// <summary>
-    /// An IPAddress that represents the local IP address.
+    /// Gets an IPAddress that represents the local IP address.
     /// </summary>
     public IPAddress IpAddress { get; }
 
     /// <summary>
-    /// The port on which to listen for request.
+    /// Gets the port on which to listen for request.
     /// </summary>
     public int Port { get; }
 
     /// <summary>
-    /// Maximum HTTP protocol version supported by the server.
+    /// Gets maximum HTTP protocol version supported by the server.
     /// </summary>
     public string ProtocolVersion { get; } = "1.2";
 
