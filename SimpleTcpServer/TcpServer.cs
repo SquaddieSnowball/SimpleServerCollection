@@ -14,17 +14,17 @@ public sealed class TcpServer
     private Exception? _stopException;
 
     /// <summary>
-    /// An IPAddress that represents the local IP address.
+    /// Gets an IPAddress that represents the local IP address.
     /// </summary>
     public IPAddress IpAddress { get; }
 
     /// <summary>
-    /// The port on which to listen for requests.
+    /// Gets the port on which to listen for requests.
     /// </summary>
     public int Port { get; }
 
     /// <summary>
-    /// The size of the byte array used as a buffer to store the request.
+    /// Gets or sets the size of the byte array used as a buffer to store the request.
     /// </summary>
     public int RequestBufferSize
     {
