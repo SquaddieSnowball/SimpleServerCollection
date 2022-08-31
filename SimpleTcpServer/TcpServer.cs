@@ -10,7 +10,9 @@ public sealed class TcpServer
 {
     private TcpListener? _server;
     private int _requestBufferSize = 1024;
+    private int _requestReadTimeout = Timeout.Infinite;
     private bool _serverStarted;
+    private Exception? _requestHandlingException;
     private Exception? _stopException;
 
     /// <summary>
@@ -38,6 +40,19 @@ public sealed class TcpServer
         }
     }
 
+    public int RequestReadTimeout
+    {
+        get => _requestReadTimeout;
+        set
+        {
+            if (value is not Timeout.Infinite and < 1)
+                throw new ArgumentOutOfRangeException(nameof(value),
+                    "The request read timeout value must be \"Timeout.Infinite\" or greater than 0.");
+
+            _requestReadTimeout = value;
+        }
+    }
+
     /// <summary>
     /// The method used to handle a request.
     /// </summary>
@@ -47,6 +62,8 @@ public sealed class TcpServer
     /// Occurs when the server starts.
     /// </summary>
     public event EventHandler? ServerStart;
+
+    public event EventHandler<Exception>? RequestHandlingFail;
 
     /// <summary>
     /// Occurs when the server is stopped.
@@ -116,7 +133,20 @@ public sealed class TcpServer
         }
     }
 
-    private void AcceptConnection() => _server!.BeginAcceptTcpClient(HandleConnection, _server);
+    private void AcceptConnection()
+    {
+        try
+        {
+            _server!.BeginAcceptTcpClient(HandleConnection, _server);
+        }
+        catch (Exception ex)
+        {
+            _requestHandlingException = ex;
+            RequestHandlingFail?.Invoke(this, _requestHandlingException);
+
+            Stop();
+        }
+    }
 
     private void HandleConnection(IAsyncResult result)
     {
@@ -127,27 +157,37 @@ public sealed class TcpServer
 
         using TcpClient client = _server!.EndAcceptTcpClient(result);
 
-        NetworkStream stream = client.GetStream();
-
-        IEnumerable<byte> request = Enumerable.Empty<byte>();
-
-        while (stream.DataAvailable)
+        try
         {
-            var requestBuffer = new byte[RequestBufferSize];
-            int bytesRead = stream.Read(requestBuffer, 0, requestBuffer.Length);
-            request = request.Concat(requestBuffer.Take(bytesRead));
+            NetworkStream stream = client.GetStream();
+            stream.ReadTimeout = RequestReadTimeout;
+
+            IEnumerable<byte> request = Enumerable.Empty<byte>();
+
+            do
+            {
+                var requestBuffer = new byte[RequestBufferSize];
+                int bytesRead = stream.Read(requestBuffer, 0, requestBuffer.Length);
+                request = request.Concat(requestBuffer.Take(bytesRead));
+            }
+            while (stream.DataAvailable);
+
+            IEnumerable<byte> response = Enumerable.Empty<byte>();
+
+            if (RequestHandler is not null)
+                response = RequestHandler(request);
+
+            byte[] responseBytes =
+                (response is not null) && response.Any() ?
+                response.ToArray() :
+                new byte[] { default };
+
+            stream.Write(responseBytes, 0, responseBytes.Length);
         }
-
-        IEnumerable<byte> response = Enumerable.Empty<byte>();
-
-        if (RequestHandler is not null)
-            response = RequestHandler(request);
-
-        byte[] responseBytes =
-            (response is not null) && response.Any() ?
-            response.ToArray() :
-            new byte[] { default };
-
-        stream.Write(responseBytes, 0, responseBytes.Length);
+        catch (Exception ex)
+        {
+            _requestHandlingException = ex;
+            RequestHandlingFail?.Invoke(this, _requestHandlingException);
+        }
     }
 }
