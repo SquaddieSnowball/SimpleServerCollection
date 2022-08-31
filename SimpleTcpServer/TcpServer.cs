@@ -40,6 +40,9 @@ public sealed class TcpServer
         }
     }
 
+    /// <summary>
+    /// Gets or sets the amount of time waiting for the request data.
+    /// </summary>
     public int RequestReadTimeout
     {
         get => _requestReadTimeout;
@@ -63,6 +66,9 @@ public sealed class TcpServer
     /// </summary>
     public event EventHandler? ServerStart;
 
+    /// <summary>
+    /// Occurs when request handling fails.
+    /// </summary>
     public event EventHandler<Exception>? RequestHandlingFail;
 
     /// <summary>
