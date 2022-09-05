@@ -13,6 +13,7 @@ public sealed class HttpServer
 {
     private readonly TcpServer _tcpServer;
     private readonly Dictionary<string, Action<HttpRequest, HttpResponse>> _endpoints = new();
+    private readonly HttpResponseBuilder _responseBuilder = new();
 
     /// <summary>
     /// Gets an IPAddress that represents the local IP address.
@@ -109,7 +110,7 @@ public sealed class HttpServer
             httpResponse = new HttpResponse(ProtocolVersion, HttpResponseStatus.BadRequest,
                 Enumerable.Empty<HttpHeader>(), string.Empty);
 
-            response = HttpResponseBuilder.Build(httpResponse);
+            response = _responseBuilder.Build(httpResponse);
 
             return response;
         }
@@ -119,7 +120,7 @@ public sealed class HttpServer
             httpResponse = new HttpResponse(ProtocolVersion, HttpResponseStatus.NotImplemented,
                 Enumerable.Empty<HttpHeader>(), string.Empty);
 
-            response = HttpResponseBuilder.Build(httpResponse);
+            response = _responseBuilder.Build(httpResponse);
 
             return response;
         }
@@ -132,7 +133,7 @@ public sealed class HttpServer
 
                 endpoint.Value(httpRequest, httpResponse);
 
-                response = HttpResponseBuilder.Build(httpResponse);
+                response = _responseBuilder.Build(httpResponse);
 
                 return response;
             }
@@ -140,7 +141,7 @@ public sealed class HttpServer
         httpResponse = new HttpResponse(ProtocolVersion, HttpResponseStatus.NotFound,
             Enumerable.Empty<HttpHeader>(), string.Empty);
 
-        response = HttpResponseBuilder.Build(httpResponse);
+        response = _responseBuilder.Build(httpResponse);
 
         return response;
     }

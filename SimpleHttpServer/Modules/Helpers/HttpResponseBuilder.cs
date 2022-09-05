@@ -9,13 +9,36 @@ namespace SimpleHttpServer.Modules.Helpers;
 /// </summary>
 internal sealed class HttpResponseBuilder
 {
+    private readonly Dictionary<string, string> _statusCodeMessageCollection = new();
+
+    public HttpResponseBuilder()
+    {
+        try
+        {
+            string[] statusStrings =
+                Properties.Resources.HttpResponseStatusMessages.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string statusString in statusStrings)
+            {
+                string statusCode = string.Concat(statusString.TakeWhile(c => char.IsDigit(c) is true));
+                string statusMessage = string.Concat(statusString.SkipWhile(c => char.IsDigit(c) is true).Skip(1));
+
+                _statusCodeMessageCollection.Add(statusCode, statusMessage);
+            }
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
     /// <summary>
     /// Creates an HTTP response from an instance of the HttpResponse class.
     /// </summary>
     /// <param name="response">An instance of the HttpResponse class.</param>
     /// <returns>Sequence of bytes containing the HTTP response.</returns>
     /// <exception cref="ArgumentNullException"></exception>
-    internal static IEnumerable<byte> Build(HttpResponse response)
+    internal IEnumerable<byte> Build(HttpResponse response)
     {
         if (response is null)
             throw new ArgumentNullException(nameof(response), "Response must not be null.");
@@ -24,7 +47,10 @@ internal sealed class HttpResponseBuilder
 
         string protocolVersion = response.ProtocolVersion;
         string statusCode = ((int)response.Status).ToString();
-        string statusMessage = response.Status.ToString();
+        string statusMessage =
+            _statusCodeMessageCollection.ContainsKey(statusCode) is true ?
+            _statusCodeMessageCollection[statusCode] :
+            response.Status.ToString();
 
         responseStringBuilder.Append("HTTP/" + protocolVersion + ' ' + statusCode + ' ' + statusMessage);
 
