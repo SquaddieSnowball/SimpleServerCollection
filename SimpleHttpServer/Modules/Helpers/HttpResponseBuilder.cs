@@ -55,7 +55,7 @@ internal sealed class HttpResponseBuilder
         responseStringBuilder.Append("HTTP/" + protocolVersion + ' ' + statusCode + ' ' + statusMessage);
 
         if (response.Headers is not null)
-            foreach (HttpHeader header in response.Headers)
+            foreach (HttpHeader header in response.Headers.OrderBy(h => h.Group))
                 responseStringBuilder.Append('\n' + header.Parameter + ": " + header.Value);
 
         if (string.IsNullOrEmpty(response.Body) is false)
