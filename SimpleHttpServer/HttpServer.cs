@@ -26,9 +26,9 @@ public sealed class HttpServer
     public int Port { get; }
 
     /// <summary>
-    /// Gets maximum HTTP protocol version supported by the server.
+    /// Gets the HTTP protocol versions supported by the server.
     /// </summary>
-    public string ProtocolVersion { get; } = "1.2";
+    public IEnumerable<string> SupportedProtocolVersions { get; } = new string[] { "1.0" };
 
     /// <summary>
     /// Initializes a new instance of the HttpServer class that runs a HTTP server
@@ -107,7 +107,17 @@ public sealed class HttpServer
         }
         catch (ArgumentException)
         {
-            httpResponse = new HttpResponse(ProtocolVersion, HttpResponseStatus.BadRequest,
+            httpResponse = new HttpResponse(SupportedProtocolVersions.Last(), HttpResponseStatus.BadRequest,
+                Enumerable.Empty<HttpHeader>(), string.Empty);
+
+            response = _responseBuilder.Build(httpResponse);
+
+            return response;
+        }
+
+        if (SupportedProtocolVersions.Contains(httpRequest.ProtocolVersion) is false)
+        {
+            httpResponse = new HttpResponse(SupportedProtocolVersions.Last(), HttpResponseStatus.HttpVersionNotSupported,
                 Enumerable.Empty<HttpHeader>(), string.Empty);
 
             response = _responseBuilder.Build(httpResponse);
@@ -117,7 +127,7 @@ public sealed class HttpServer
 
         if (httpRequest.Method == HttpRequestMethod.NOTIMPLEMENTED)
         {
-            httpResponse = new HttpResponse(ProtocolVersion, HttpResponseStatus.NotImplemented,
+            httpResponse = new HttpResponse(httpRequest.ProtocolVersion, HttpResponseStatus.NotImplemented,
                 Enumerable.Empty<HttpHeader>(), string.Empty);
 
             response = _responseBuilder.Build(httpResponse);
@@ -125,21 +135,20 @@ public sealed class HttpServer
             return response;
         }
 
-        foreach (KeyValuePair<string, Action<HttpRequest, HttpResponse>> endpoint in _endpoints)
-            if (endpoint.Key.Equals(httpRequest.Target, StringComparison.Ordinal))
-            {
-                httpResponse = new HttpResponse(ProtocolVersion, HttpResponseStatus.OK,
-                    Enumerable.Empty<HttpHeader>(), string.Empty);
+        if (_endpoints.ContainsKey(httpRequest.Target) is false)
+        {
+            httpResponse = new HttpResponse(httpRequest.ProtocolVersion, HttpResponseStatus.NotFound,
+                Enumerable.Empty<HttpHeader>(), string.Empty);
 
-                endpoint.Value(httpRequest, httpResponse);
+            response = _responseBuilder.Build(httpResponse);
 
-                response = _responseBuilder.Build(httpResponse);
+            return response;
+        }
 
-                return response;
-            }
-
-        httpResponse = new HttpResponse(ProtocolVersion, HttpResponseStatus.NotFound,
+        httpResponse = new HttpResponse(httpRequest.ProtocolVersion, HttpResponseStatus.OK,
             Enumerable.Empty<HttpHeader>(), string.Empty);
+
+        _endpoints[httpRequest.Target](httpRequest, httpResponse);
 
         response = _responseBuilder.Build(httpResponse);
 
