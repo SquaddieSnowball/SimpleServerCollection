@@ -24,7 +24,8 @@ internal sealed class HttpRequestParser
     internal static HttpRequest ParseFromBytes(IEnumerable<byte> request)
     {
         if (request is null)
-            throw new ArgumentNullException(nameof(request), "Request must not be null.");
+            throw new ArgumentNullException(nameof(request),
+                "Request must not be null.");
 
         string requestString = Encoding.ASCII.GetString(request.ToArray());
 
@@ -33,12 +34,14 @@ internal sealed class HttpRequestParser
         string? currentLine = stringReader.ReadLine();
 
         if (currentLine is null)
-            throw new ArgumentException("Parse error: start line not found.", nameof(request));
+            throw new ArgumentException("Parse error: start line not found.",
+                nameof(request));
 
         Match startLineMatch = Regex.Match(currentLine, StartLinePattern);
 
         if (startLineMatch.Success is false)
-            throw new ArgumentException("Parse error: start line does not match pattern.", nameof(request));
+            throw new ArgumentException("Parse error: start line does not match pattern.",
+                nameof(request));
 
         var headerMatches = new List<Match>();
         string body = string.Empty;
@@ -55,7 +58,8 @@ internal sealed class HttpRequestParser
             Match headerMatch = Regex.Match(currentLine, HeaderPattern);
 
             if (headerMatch.Success is false)
-                throw new ArgumentException("Parse error: one or more headers do not match the pattern.", nameof(request));
+                throw new ArgumentException("Parse error: one or more headers do not match the pattern.",
+                    nameof(request));
 
             headerMatches.Add(headerMatch);
         }
@@ -79,7 +83,8 @@ internal sealed class HttpRequestParser
                 Match queryParameterMatch = Regex.Match(queryParameterString, QueryParameterPattern);
 
                 if (queryParameterMatch.Success is false)
-                    throw new ArgumentException("Parse error: one or more query parameters do not match the pattern.", nameof(request));
+                    throw new ArgumentException("Parse error: one or more query parameters do not match the pattern.",
+                        nameof(request));
 
                 queryParameters.Add(new HttpRequestQueryParameter(
                     queryParameterMatch.Groups["parameter"].Value,

@@ -41,7 +41,8 @@ internal sealed class HttpResponseBuilder
     internal IEnumerable<byte> Build(HttpResponse response)
     {
         if (response is null)
-            throw new ArgumentNullException(nameof(response), "Response must not be null.");
+            throw new ArgumentNullException(nameof(response),
+                "Response must not be null.");
 
         var responseStringBuilder = new StringBuilder();
 

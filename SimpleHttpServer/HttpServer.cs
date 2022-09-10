@@ -12,7 +12,7 @@ namespace SimpleHttpServer;
 public sealed class HttpServer
 {
     private readonly TcpServer _tcpServer;
-    private readonly Dictionary<string, Action<HttpRequest, HttpResponse>> _endpoints = new();
+    private readonly Dictionary<string, Action<HttpRequest, HttpResponse>> _endPoints = new();
     private readonly HttpResponseBuilder _responseBuilder = new();
 
     /// <summary>
@@ -64,31 +64,35 @@ public sealed class HttpServer
     /// <summary>
     /// Stops the server.
     /// </summary>
-    public void Stop() => _tcpServer?.Stop();
+    public void Stop() =>
+        _tcpServer?.Stop();
 
     /// <summary>
-    /// Adds an endpoint and it's handler to the HTTP server.
+    /// Adds an end point and it's handler to the HTTP server.
     /// </summary>
-    /// <param name="target">Endpoint to add to the HTTP server.</param>
-    /// <param name="handler">Endpoint handler.</param>
+    /// <param name="target">Target of an end point.</param>
+    /// <param name="handler">End point handler.</param>
     /// <returns>The current instance of the HttpServer class.</returns>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentNullException"></exception>
-    public HttpServer AddEndpoint(string target, Action<HttpRequest, HttpResponse> handler)
+    public HttpServer AddEndPoint(string target, Action<HttpRequest, HttpResponse> handler)
     {
         if (string.IsNullOrEmpty(target) is true)
-            throw new ArgumentException("Target must not be null or empty.", nameof(target));
+            throw new ArgumentException("Target must not be null or empty.",
+                nameof(target));
 
         if (handler is null)
-            throw new ArgumentNullException(nameof(handler), "Handler must not be null.");
+            throw new ArgumentNullException(nameof(handler),
+                "Handler must not be null.");
 
         try
         {
-            _endpoints.Add(target, handler);
+            _endPoints.Add(target, handler);
         }
         catch (ArgumentException)
         {
-            throw new ArgumentException("The specified endpoint is already assigned.", nameof(target));
+            throw new ArgumentException("The specified endpoint is already assigned.",
+                nameof(target));
         }
 
         return this;
@@ -135,7 +139,7 @@ public sealed class HttpServer
             return response;
         }
 
-        if (_endpoints.ContainsKey(httpRequest.Target) is false)
+        if (_endPoints.ContainsKey(httpRequest.Target) is false)
         {
             httpResponse = new HttpResponse(httpRequest.ProtocolVersion, HttpResponseStatus.NotFound,
                 Enumerable.Empty<HttpHeader>(), string.Empty);
@@ -148,7 +152,7 @@ public sealed class HttpServer
         httpResponse = new HttpResponse(httpRequest.ProtocolVersion, HttpResponseStatus.OK,
             Enumerable.Empty<HttpHeader>(), string.Empty);
 
-        _endpoints[httpRequest.Target](httpRequest, httpResponse);
+        _endPoints[httpRequest.Target](httpRequest, httpResponse);
 
         response = _responseBuilder.Build(httpResponse);
 

@@ -34,6 +34,8 @@ public sealed class HttpResponse
     /// <param name="status">Status of an HTTP response.</param>
     /// <param name="headers">Headers of an HTTP response.</param>
     /// <param name="body">Body of an HTTP response.</param>
-    public HttpResponse(string protocolVersion, HttpResponseStatus status, IEnumerable<HttpHeader> headers, string body) =>
-        (ProtocolVersion, Status, Headers, Body) = (protocolVersion, status, headers, body);
+    public HttpResponse(string protocolVersion, HttpResponseStatus status,
+        IEnumerable<HttpHeader> headers, string body) =>
+        (ProtocolVersion, Status, Headers, Body) =
+        (protocolVersion, status, headers, body);
 }
