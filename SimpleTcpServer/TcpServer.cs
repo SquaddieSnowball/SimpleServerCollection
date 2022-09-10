@@ -34,7 +34,8 @@ public sealed class TcpServer
         set
         {
             if (value < 1)
-                throw new ArgumentOutOfRangeException(nameof(value), "The request buffer size value must be greater than 0.");
+                throw new ArgumentOutOfRangeException(nameof(value),
+                    "The request buffer size value must be greater than 0.");
 
             _requestBufferSize = value;
         }
@@ -82,7 +83,8 @@ public sealed class TcpServer
     /// </summary>
     /// <param name="ipAddress">An IPAddress that represents the local IP address.</param>
     /// <param name="port">The port on which to listen for requests.</param>
-    public TcpServer(IPAddress ipAddress, int port) => (IpAddress, Port) = (ipAddress, port);
+    public TcpServer(IPAddress ipAddress, int port) =>
+        (IpAddress, Port) = (ipAddress, port);
 
     /// <summary>
     /// Starts the server.
@@ -100,15 +102,7 @@ public sealed class TcpServer
             _serverStarted = true;
             ServerStart?.Invoke(this, EventArgs.Empty);
         }
-        catch (ArgumentNullException)
-        {
-            throw;
-        }
-        catch (ArgumentOutOfRangeException)
-        {
-            throw;
-        }
-        catch (SocketException)
+        catch
         {
             throw;
         }
