@@ -1,4 +1,7 @@
-﻿using SimpleTcpServer.Modules.Entities;
+﻿using Microsoft.Extensions.Logging;
+using SimpleTcpServer.Modules.Entities;
+using SimpleTcpServer.Modules.Helpers;
+using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 
@@ -10,10 +13,11 @@ namespace SimpleTcpServer;
 public sealed class TcpServer
 {
     private TcpListener? _server;
+    private readonly ILogger<TcpServer>? _logger;
     private bool _isServerStarted;
     private int _requestBufferSize = 1024;
     private int _requestReadTimeout = Timeout.Infinite;
-    private readonly Dictionary<Guid, TcpClient> _connectedClients = new();
+    private readonly ConcurrentDictionary<Guid, TcpClient> _connectedClients = new();
     private Exception? _stopException;
     private Exception? _requestHandlingException;
 
@@ -75,6 +79,21 @@ public sealed class TcpServer
     public event EventHandler<Exception?>? ServerStop;
 
     /// <summary>
+    /// Occurs when the connection is opened.
+    /// </summary>
+    public event EventHandler<Guid>? ConnectionOpen;
+
+    /// <summary>
+    /// Occurs when the connection is closed.
+    /// </summary>
+    public event EventHandler<Guid>? ConnectionClose;
+
+    /// <summary>
+    /// Occurs when request handling finishes.
+    /// </summary>
+    public event EventHandler<Guid>? RequestHandling;
+
+    /// <summary>
     /// Occurs when request handling fails.
     /// </summary>
     public event EventHandler<Exception>? RequestHandlingFail;
@@ -89,6 +108,16 @@ public sealed class TcpServer
         (IpAddress, Port) = (ipAddress, port);
 
     /// <summary>
+    /// Initializes a new instance of the TcpServer class that runs a TCP server
+    /// which listens for requests on the specified local IP address and port number.
+    /// </summary>
+    /// <param name="ipAddress">An IPAddress that represents the local IP address.</param>
+    /// <param name="port">The port on which to listen for requests.</param>
+    /// <param name="logger">The logger that will be used to log events.</param>
+    public TcpServer(IPAddress ipAddress, int port, ILogger<TcpServer> logger) : this(ipAddress, port) =>
+        _logger = logger;
+
+    /// <summary>
     /// Starts the server.
     /// </summary>
     public void Start()
@@ -100,9 +129,12 @@ public sealed class TcpServer
         {
             _server = new TcpListener(IpAddress, Port);
             _server.Start();
-
             _isServerStarted = true;
+
             ServerStart?.Invoke(this, EventArgs.Empty);
+
+            _logger?.LogInformation(LoggingEvents.ServerStart, "{EventName} at {IpAddress}:{Port}",
+                LoggingEvents.ServerStart.Name, IpAddress, Port);
         }
         catch
         {
@@ -133,7 +165,15 @@ public sealed class TcpServer
         finally
         {
             _isServerStarted = false;
+
             ServerStop?.Invoke(this, _stopException);
+
+            if (_stopException is null)
+                _logger?.LogInformation(LoggingEvents.ServerStop, "{EventName} at {IpAddress}:{Port}",
+                    LoggingEvents.ServerStop.Name, IpAddress, Port);
+            else
+                _logger?.LogCritical(LoggingEvents.ServerStopException, _stopException, "{EventName} at {IpAddress}:{Port}",
+                    LoggingEvents.ServerStopException.Name, IpAddress, Port);
         }
     }
 
@@ -141,16 +181,18 @@ public sealed class TcpServer
     /// Closes the connection to the server.
     /// </summary>
     /// <param name="connectionId">Connection ID.</param>
-    /// <exception cref="ArgumentException"></exception>
-    public void CloseConnection(Guid connectionId)
+    /// <returns>true if the connection was closed; false if the connection is already closed.</returns>
+    public bool CloseConnection(Guid connectionId)
     {
         try
         {
             _connectedClients[connectionId].Close();
+
+            return true;
         }
         catch (KeyNotFoundException)
         {
-            throw new ArgumentException("The client with the specified ID does not exist.");
+            return false;
         }
     }
 
@@ -163,7 +205,11 @@ public sealed class TcpServer
         catch (Exception ex)
         {
             _requestHandlingException = ex;
+
             RequestHandlingFail?.Invoke(this, _requestHandlingException);
+
+            _logger?.LogCritical(LoggingEvents.RequestHandlingFailBeforeConnection, _requestHandlingException,
+                "{EventName}", LoggingEvents.RequestHandlingFailBeforeConnection.Name);
 
             Stop();
         }
@@ -179,7 +225,12 @@ public sealed class TcpServer
         Guid connectionId = Guid.NewGuid();
         TcpClient client = _server!.EndAcceptTcpClient(result);
 
-        _connectedClients.Add(connectionId, client);
+        _ = _connectedClients.TryAdd(connectionId, client);
+
+        ConnectionOpen?.Invoke(this, connectionId);
+
+        _logger?.LogInformation(LoggingEvents.ConnectionOpen, "{EventName} (ID: {ConnectionId})",
+            LoggingEvents.ConnectionOpen.Name, connectionId);
 
         try
         {
@@ -191,12 +242,22 @@ public sealed class TcpServer
         catch (Exception ex)
         {
             _requestHandlingException = ex;
+
             RequestHandlingFail?.Invoke(this, _requestHandlingException);
+
+            _logger?.LogError(LoggingEvents.RequestHandlingFailAfterConnection, _requestHandlingException,
+                "{EventName} (Conndection ID: {ConnectionId})", LoggingEvents.RequestHandlingFailAfterConnection.Name,
+                connectionId);
         }
         finally
         {
             client.Close();
-            _ = _connectedClients.Remove(connectionId);
+            _ = _connectedClients.TryRemove(connectionId, out _);
+
+            ConnectionClose?.Invoke(this, connectionId);
+
+            _logger?.LogInformation(LoggingEvents.ConnectionClose, "{EventName} (ID: {ConnectionId})",
+                LoggingEvents.ConnectionClose.Name, connectionId);
         }
     }
 
@@ -213,24 +274,21 @@ public sealed class TcpServer
         while (stream.DataAvailable);
 
         TcpRequest? request = new(connectionId, requestBody);
-        TcpResponse? response = default;
+        TcpResponse? response = RequestHandler?.Invoke(request);
 
-        if (RequestHandler is not null)
-            response = RequestHandler(request);
+        byte[] responseBytes =
+            (response is not null) && (response.Body is not null) && (response.Body.Any() is true) ?
+            response.Body.ToArray() :
+            new byte[] { default };
 
-        if (response is not null)
-        {
-            byte[] responseBytes =
-                (response.Body is not null) && (response.Body.Any() is true) ?
-                response.Body.ToArray() :
-                new byte[] { default };
+        stream.Write(responseBytes, 0, responseBytes.Length);
 
-            stream.Write(responseBytes, 0, responseBytes.Length);
+        RequestHandling?.Invoke(this, connectionId);
 
-            if (response.KeepConnectionAlive is true)
-                HandleRequest(connectionId, stream);
-        }
-        else
-            stream.Write(new byte[] { default }, 0, 1);
+        _logger?.LogInformation(LoggingEvents.RequestHandling, "{EventName} (Conndection ID: {ConnectionId})",
+            LoggingEvents.RequestHandling.Name, connectionId);
+
+        if (response?.KeepConnectionAlive is true)
+            HandleRequest(connectionId, stream);
     }
 }
