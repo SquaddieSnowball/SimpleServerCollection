@@ -81,22 +81,27 @@ public sealed class TcpServer
     /// <summary>
     /// Occurs when the connection is opened.
     /// </summary>
-    public event EventHandler<Guid>? ConnectionOpen;
+    public event EventHandler<TcpConnection>? ConnectionOpen;
 
     /// <summary>
     /// Occurs when the connection is closed.
     /// </summary>
-    public event EventHandler<Guid>? ConnectionClose;
+    public event EventHandler<TcpConnection>? ConnectionClose;
 
     /// <summary>
     /// Occurs when request handling finishes.
     /// </summary>
-    public event EventHandler<Guid>? RequestHandling;
+    public event EventHandler<TcpRequest>? RequestHandling;
 
     /// <summary>
-    /// Occurs when request handling fails.
+    /// Occurs when request handling fails before connection.
     /// </summary>
-    public event EventHandler<Exception>? RequestHandlingFail;
+    public event EventHandler<Exception>? RequestHandlingFailBeforeConnection;
+
+    /// <summary>
+    /// Occurs when request handling fails after connection.
+    /// </summary>
+    public event EventHandler<(Exception, TcpConnection)>? RequestHandlingFailAfterConnection;
 
     /// <summary>
     /// Initializes a new instance of the TcpServer class that runs a TCP server
@@ -180,7 +185,7 @@ public sealed class TcpServer
     /// <summary>
     /// Closes the connection to the server.
     /// </summary>
-    /// <param name="connectionId">Connection ID.</param>
+    /// <param name="connectionId">ID of the connection to close.</param>
     /// <returns>true if the connection was closed; false if the connection is already closed.</returns>
     public bool CloseConnection(Guid connectionId)
     {
@@ -206,7 +211,7 @@ public sealed class TcpServer
         {
             _requestHandlingException = ex;
 
-            RequestHandlingFail?.Invoke(this, _requestHandlingException);
+            RequestHandlingFailBeforeConnection?.Invoke(this, _requestHandlingException);
 
             _logger?.LogCritical(LoggingEvents.RequestHandlingFailBeforeConnection, _requestHandlingException,
                 "{EventName}", LoggingEvents.RequestHandlingFailBeforeConnection.Name);
@@ -222,46 +227,47 @@ public sealed class TcpServer
 
         AcceptConnection();
 
-        Guid connectionId = Guid.NewGuid();
         TcpClient client = _server!.EndAcceptTcpClient(result);
+        TcpConnection connection = new(Guid.NewGuid(), (IPEndPoint)client.Client.RemoteEndPoint!);
 
-        _ = _connectedClients.TryAdd(connectionId, client);
+        _ = _connectedClients.TryAdd(connection.Id, client);
 
-        ConnectionOpen?.Invoke(this, connectionId);
+        ConnectionOpen?.Invoke(this, connection);
 
-        _logger?.LogInformation(LoggingEvents.ConnectionOpen, "{EventName} (ID: {ConnectionId})",
-            LoggingEvents.ConnectionOpen.Name, connectionId);
+        _logger?.LogInformation(LoggingEvents.ConnectionOpen, "{EventName} on {IpAddress}:{Port} (ID: {ConnectionId})",
+            LoggingEvents.ConnectionOpen.Name, connection.RemoteEndPoint.Address,
+            connection.RemoteEndPoint.Port, connection.Id);
 
         try
         {
             NetworkStream stream = client.GetStream();
             stream.ReadTimeout = RequestReadTimeout;
 
-            HandleRequest(connectionId, stream);
+            HandleRequest(connection, stream);
         }
         catch (Exception ex)
         {
             _requestHandlingException = ex;
 
-            RequestHandlingFail?.Invoke(this, _requestHandlingException);
+            RequestHandlingFailAfterConnection?.Invoke(this, (_requestHandlingException, connection));
 
             _logger?.LogError(LoggingEvents.RequestHandlingFailAfterConnection, _requestHandlingException,
-                "{EventName} (Conndection ID: {ConnectionId})", LoggingEvents.RequestHandlingFailAfterConnection.Name,
-                connectionId);
+                "{EventName} (Conndection ID: {ConnectionId})",
+                LoggingEvents.RequestHandlingFailAfterConnection.Name, connection.Id);
         }
         finally
         {
             client.Close();
-            _ = _connectedClients.TryRemove(connectionId, out _);
+            _ = _connectedClients.TryRemove(connection.Id, out _);
 
-            ConnectionClose?.Invoke(this, connectionId);
+            ConnectionClose?.Invoke(this, connection);
 
             _logger?.LogInformation(LoggingEvents.ConnectionClose, "{EventName} (ID: {ConnectionId})",
-                LoggingEvents.ConnectionClose.Name, connectionId);
+                LoggingEvents.ConnectionClose.Name, connection.Id);
         }
     }
 
-    private void HandleRequest(Guid connectionId, NetworkStream stream)
+    private void HandleRequest(TcpConnection connection, NetworkStream stream)
     {
         IEnumerable<byte> requestBody = Enumerable.Empty<byte>();
 
@@ -273,7 +279,7 @@ public sealed class TcpServer
         }
         while (stream.DataAvailable);
 
-        TcpRequest? request = new(connectionId, requestBody);
+        TcpRequest request = new(connection, requestBody);
         TcpResponse? response = RequestHandler?.Invoke(request);
 
         byte[] responseBytes =
@@ -283,12 +289,12 @@ public sealed class TcpServer
 
         stream.Write(responseBytes, 0, responseBytes.Length);
 
-        RequestHandling?.Invoke(this, connectionId);
+        RequestHandling?.Invoke(this, request);
 
         _logger?.LogInformation(LoggingEvents.RequestHandling, "{EventName} (Conndection ID: {ConnectionId})",
-            LoggingEvents.RequestHandling.Name, connectionId);
+            LoggingEvents.RequestHandling.Name, connection.Id);
 
         if (response?.KeepConnectionAlive is true)
-            HandleRequest(connectionId, stream);
+            HandleRequest(connection, stream);
     }
 }

@@ -6,9 +6,9 @@
 public sealed class TcpRequest
 {
     /// <summary>
-    /// Gets the ID of the connection through which the request came.
+    /// Gets the connection through which the request came.
     /// </summary>
-    public Guid ConnectionId { get; }
+    public TcpConnection Connection { get; }
 
     /// <summary>
     /// Gets the body of the TCP request.
@@ -20,6 +20,6 @@ public sealed class TcpRequest
     /// </summary>
     /// <param name="connectionId">The connection through which the request came.</param>
     /// <param name="body">The body of the TCP request.</param>
-    public TcpRequest(Guid connectionId, IEnumerable<byte> body) =>
-        (ConnectionId, Body) = (connectionId, body);
+    public TcpRequest(TcpConnection connection, IEnumerable<byte> body) =>
+        (Connection, Body) = (connection, body);
 }
