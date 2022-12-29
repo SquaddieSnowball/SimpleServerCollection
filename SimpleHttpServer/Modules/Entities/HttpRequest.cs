@@ -35,7 +35,7 @@ public sealed class HttpRequest
     /// <summary>
     /// Gets body of an HTTP request.
     /// </summary>
-    public string Body { get; }
+    public string? Body { get; }
 
     /// <summary>
     /// Initializes a new instance of the HttpRequest class.
@@ -47,7 +47,7 @@ public sealed class HttpRequest
     /// <param name="headers">Headers of an HTTP request.</param>
     /// <param name="body">Body of an HTTP request.</param>
     public HttpRequest(HttpRequestMethod method, string target, IEnumerable<HttpRequestQueryParameter> queryParameters,
-        string protocolVersion, IEnumerable<HttpHeader> headers, string body) =>
+        string protocolVersion, IEnumerable<HttpHeader> headers, string? body = default) =>
         (Method, Target, QueryParameters, ProtocolVersion, Headers, Body) =
         (method, target, queryParameters, protocolVersion, headers, body);
 }

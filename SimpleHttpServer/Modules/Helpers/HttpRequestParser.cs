@@ -8,7 +8,7 @@ namespace SimpleHttpServer.Modules.Helpers;
 /// <summary>
 /// Provides methods used to parse HTTP requests.
 /// </summary>
-internal sealed class HttpRequestParser
+internal static class HttpRequestParser
 {
     private const string StartLinePattern = @"^(?<method>\w+)\s(?<target>.+)\sHTTP/(?<protocolVersion>\d(.\d)*)$";
     private const string QueryParameterPattern = @"^(?<parameter>.+)=(?<value>.+)$";
@@ -29,9 +29,9 @@ internal sealed class HttpRequestParser
 
         string requestString = Encoding.ASCII.GetString(request.ToArray());
 
-        using var stringReader = new StringReader(requestString);
+        using StringReader requestStringReader = new(requestString);
 
-        string? currentLine = stringReader.ReadLine();
+        string? currentLine = requestStringReader.ReadLine();
 
         if (currentLine is null)
             throw new ArgumentException("Parse error: start line not found.",
@@ -40,17 +40,17 @@ internal sealed class HttpRequestParser
         Match startLineMatch = Regex.Match(currentLine, StartLinePattern);
 
         if (startLineMatch.Success is false)
-            throw new ArgumentException("Parse error: start line does not match pattern.",
+            throw new ArgumentException("Parse error: start line does not match the pattern.",
                 nameof(request));
 
-        var headerMatches = new List<Match>();
-        string body = string.Empty;
+        List<Match> headerMatches = new();
+        string? body = default;
 
-        while ((currentLine = stringReader.ReadLine()) is not null)
+        while ((currentLine = requestStringReader.ReadLine()) is not null)
         {
-            if (currentLine.Equals(string.Empty, StringComparison.Ordinal))
+            if (currentLine.Equals(string.Empty, StringComparison.Ordinal) is true)
             {
-                body = stringReader.ReadToEnd().Trim();
+                body = requestStringReader.ReadToEnd().Trim();
 
                 break;
             }
@@ -68,14 +68,16 @@ internal sealed class HttpRequestParser
             method = HttpRequestMethod.NOTIMPLEMENTED;
 
         string target;
-        var queryParameters = new List<HttpRequestQueryParameter>();
+        List<HttpRequestQueryParameter> queryParameters = new();
 
-        if (startLineMatch.Groups["target"].Value.Contains('?'))
+        if (startLineMatch.Groups["target"].Value.Contains('?') is true)
         {
-            target = string.Concat(startLineMatch.Groups["target"].Value.TakeWhile(c => c.Equals('?') is false));
+            target =
+                string.Concat(startLineMatch.Groups["target"].Value.TakeWhile(c => c.Equals('?') is false));
 
             string[] queryParameterStrings =
-                string.Concat(startLineMatch.Groups["target"].Value.SkipWhile(c => c.Equals('?') is false).Skip(1))
+                string.Concat(startLineMatch.Groups["target"].Value.SkipWhile(c => c.Equals('?') is false)
+                .Skip(1))
                 .Split(new char[] { '&' }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (string queryParameterString in queryParameterStrings)
@@ -96,7 +98,7 @@ internal sealed class HttpRequestParser
 
         string protocolVersion = startLineMatch.Groups["protocolVersion"].Value;
 
-        var headers = new List<HttpHeader>();
+        List<HttpHeader> headers = new();
 
         foreach (Match headerMatch in headerMatches)
             headers.Add(new HttpHeader(
@@ -104,7 +106,7 @@ internal sealed class HttpRequestParser
                 headerMatch.Groups["parameter"].Value,
                 headerMatch.Groups["value"].Value));
 
-        var httpRequest = new HttpRequest(method, target, queryParameters, protocolVersion, headers, body);
+        HttpRequest httpRequest = new(method, target, queryParameters, protocolVersion, headers, body);
 
         return httpRequest;
     }

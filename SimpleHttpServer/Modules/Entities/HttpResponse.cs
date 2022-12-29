@@ -8,9 +8,9 @@ namespace SimpleHttpServer.Modules.Entities;
 public sealed class HttpResponse
 {
     /// <summary>
-    /// Gets or sets protocol version of an HTTP response.
+    /// Gets protocol version of an HTTP response.
     /// </summary>
-    public string ProtocolVersion { get; set; }
+    public string ProtocolVersion { get; }
 
     /// <summary>
     /// Gets or sets status of an HTTP response.
@@ -25,7 +25,7 @@ public sealed class HttpResponse
     /// <summary>
     /// Gets or sets body of an HTTP response.
     /// </summary>
-    public string Body { get; set; }
+    public string? Body { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the HttpResponse class.
@@ -35,7 +35,7 @@ public sealed class HttpResponse
     /// <param name="headers">Headers of an HTTP response.</param>
     /// <param name="body">Body of an HTTP response.</param>
     public HttpResponse(string protocolVersion, HttpResponseStatus status,
-        IEnumerable<HttpHeader> headers, string body) =>
+        IEnumerable<HttpHeader> headers, string? body = default) =>
         (ProtocolVersion, Status, Headers, Body) =
         (protocolVersion, status, headers, body);
 }
