@@ -95,5 +95,129 @@ namespace SimpleHttpServer.Properties {
                 return ResourceManager.GetString("HttpResponseStatusMessages", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
+        ///&lt;html&gt;
+        ///
+        ///&lt;head&gt;
+        ///    &lt;title&gt;
+        ///        400 Bad Request
+        ///    &lt;/title&gt;
+        ///&lt;/head&gt;
+        ///
+        ///&lt;body style=&quot;text-align: center;&quot;&gt;
+        ///    &lt;h1&gt;
+        ///        400 Bad Request
+        ///    &lt;/h1&gt;
+        ///    &lt;p&gt;
+        ///        The server cannot process the request due to a client error
+        ///    &lt;/p&gt;
+        ///    &lt;hr&gt;
+        ///    &lt;p&gt;
+        ///        Simple HTTP server
+        ///    &lt;/p&gt;
+        ///&lt;/body&gt;
+        ///
+        ///&lt;/html&gt;.
+        /// </summary>
+        internal static string ServerResponsePage400 {
+            get {
+                return ResourceManager.GetString("ServerResponsePage400", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
+        ///&lt;html&gt;
+        ///
+        ///&lt;head&gt;
+        ///    &lt;title&gt;
+        ///        404 Not Found
+        ///    &lt;/title&gt;
+        ///&lt;/head&gt;
+        ///
+        ///&lt;body style=&quot;text-align: center;&quot;&gt;
+        ///    &lt;h1&gt;
+        ///        404 Not Found
+        ///    &lt;/h1&gt;
+        ///    &lt;p&gt;
+        ///        The server cannot find the requested resource
+        ///    &lt;/p&gt;
+        ///    &lt;hr&gt;
+        ///    &lt;p&gt;
+        ///        Simple HTTP server
+        ///    &lt;/p&gt;
+        ///&lt;/body&gt;
+        ///
+        ///&lt;/html&gt;.
+        /// </summary>
+        internal static string ServerResponsePage404 {
+            get {
+                return ResourceManager.GetString("ServerResponsePage404", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
+        ///&lt;html&gt;
+        ///
+        ///&lt;head&gt;
+        ///    &lt;title&gt;
+        ///        501 Not Implemented
+        ///    &lt;/title&gt;
+        ///&lt;/head&gt;
+        ///
+        ///&lt;body style=&quot;text-align: center;&quot;&gt;
+        ///    &lt;h1&gt;
+        ///        501 Not Implemented
+        ///    &lt;/h1&gt;
+        ///    &lt;p&gt;
+        ///        The server does not support the functionality required to fulfill the request
+        ///    &lt;/p&gt;
+        ///    &lt;hr&gt;
+        ///    &lt;p&gt;
+        ///        Simple HTTP server
+        ///    &lt;/p&gt;
+        ///&lt;/body&gt;
+        ///
+        ///&lt;/html&gt;.
+        /// </summary>
+        internal static string ServerResponsePage501 {
+            get {
+                return ResourceManager.GetString("ServerResponsePage501", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
+        ///&lt;html&gt;
+        ///
+        ///&lt;head&gt;
+        ///    &lt;title&gt;
+        ///        505 HTTP Version Not Supported
+        ///    &lt;/title&gt;
+        ///&lt;/head&gt;
+        ///
+        ///&lt;body style=&quot;text-align: center;&quot;&gt;
+        ///    &lt;h1&gt;
+        ///        505 HTTP Version Not Supported
+        ///    &lt;/h1&gt;
+        ///    &lt;p&gt;
+        ///        The HTTP version used in the request is not supported by the server
+        ///    &lt;/p&gt;
+        ///    &lt;hr&gt;
+        ///    &lt;p&gt;
+        ///        Simple HTTP server
+        ///    &lt;/p&gt;
+        ///&lt;/body&gt;
+        ///
+        ///&lt;/html&gt;.
+        /// </summary>
+        internal static string ServerResponsePage505 {
+            get {
+                return ResourceManager.GetString("ServerResponsePage505", resourceCulture);
+            }
+        }
     }
 }

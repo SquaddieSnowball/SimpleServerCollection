@@ -121,4 +121,16 @@
   <data name="HttpResponseStatusMessages" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\HttpResponseStatusMessages.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="ServerResponsePage400" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ServerResponsePage400.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="ServerResponsePage404" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ServerResponsePage404.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="ServerResponsePage501" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ServerResponsePage501.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="ServerResponsePage505" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ServerResponsePage505.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
 </root>
