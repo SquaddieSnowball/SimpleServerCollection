@@ -4,6 +4,19 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<Product>SimpleTcpServer</Product>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<FileVersion>1.0.0.0</FileVersion>
+		<PackageId>SquaddieSnowball.SimpleServerCollection.SimpleTcpServer</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>SquaddieSnowball</Authors>
+		<Company>SquaddieSnowball</Company>
+		<Title>Simple TCP server</Title>
+		<Description>This package is part of the "Simple server collection" project and includes a TCP server.</Description>
+		<PackageTags>server;tcp</PackageTags>
+		<RepositoryType>git</RepositoryType>
+		<RepositoryUrl>https://github.com/SquaddieSnowball/SimpleServerCollection</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 
 	<ItemGroup>
