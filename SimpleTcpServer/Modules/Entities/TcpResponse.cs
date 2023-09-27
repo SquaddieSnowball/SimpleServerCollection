@@ -3,22 +3,16 @@
 /// <summary>
 /// Represents a TCP response.
 /// </summary>
-public sealed class TcpResponse
+/// <param name="Body">Response body.</param>
+public record class TcpResponse(IEnumerable<byte> Body)
 {
     /// <summary>
-    /// Gets or sets the body of the TCP response.
+    /// Response body.
     /// </summary>
-    public IEnumerable<byte> Body { get; set; }
+    public IEnumerable<byte> Body { get; set; } = Body;
 
     /// <summary>
-    /// Gets or sets a value determining whether the connection should be maintained after the request has been handled.
+    /// A value that determines whether the connection should be kept alive after the request has been processed.
     /// </summary>
     public bool KeepConnectionAlive { get; set; }
-
-    /// <summary>
-    /// Initializes a new instance of the TcpResponse class.
-    /// </summary>
-    /// <param name="body">The body of the TCP response.</param>
-    public TcpResponse(IEnumerable<byte> body) =>
-        Body = body;
 }

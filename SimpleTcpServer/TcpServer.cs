@@ -279,7 +279,7 @@ public sealed class TcpServer
         }
         while (stream.DataAvailable);
 
-        TcpRequest request = new(connection, requestBody);
+        TcpRequest request = new(requestBody, connection);
         TcpResponse? response = RequestHandler?.Invoke(request);
 
         byte[] responseBytes =
