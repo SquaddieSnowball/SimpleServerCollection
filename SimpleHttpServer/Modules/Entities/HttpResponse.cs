@@ -5,37 +5,25 @@ namespace SimpleHttpServer.Modules.Entities;
 /// <summary>
 /// Represents an HTTP response.
 /// </summary>
-public sealed class HttpResponse
+/// <param name="ProtocolVersion">Protocol version of the response.</param>
+/// <param name="Status">Response status.</param>
+/// <param name="Headers">Response headers.</param>
+/// <param name="Body">Response body.</param>
+public record class HttpResponse(string ProtocolVersion, HttpResponseStatus Status,
+    IEnumerable<HttpHeader> Headers, string? Body = default)
 {
     /// <summary>
-    /// Gets protocol version of an HTTP response.
+    /// Response status.
     /// </summary>
-    public string ProtocolVersion { get; }
+    public HttpResponseStatus Status { get; set; } = Status;
 
     /// <summary>
-    /// Gets or sets status of an HTTP response.
+    /// Response headers.
     /// </summary>
-    public HttpResponseStatus Status { get; set; }
+    public IEnumerable<HttpHeader> Headers { get; set; } = Headers;
 
     /// <summary>
-    /// Gets or sets headers of an HTTP response.
+    /// Response body.
     /// </summary>
-    public IEnumerable<HttpHeader> Headers { get; set; }
-
-    /// <summary>
-    /// Gets or sets body of an HTTP response.
-    /// </summary>
-    public string? Body { get; set; }
-
-    /// <summary>
-    /// Initializes a new instance of the HttpResponse class.
-    /// </summary>
-    /// <param name="protocolVersion">Protocol version of an HTTP response.</param>
-    /// <param name="status">Status of an HTTP response.</param>
-    /// <param name="headers">Headers of an HTTP response.</param>
-    /// <param name="body">Body of an HTTP response.</param>
-    public HttpResponse(string protocolVersion, HttpResponseStatus status,
-        IEnumerable<HttpHeader> headers, string? body = default) =>
-        (ProtocolVersion, Status, Headers, Body) =
-        (protocolVersion, status, headers, body);
+    public string? Body { get; set; } = Body;
 }
