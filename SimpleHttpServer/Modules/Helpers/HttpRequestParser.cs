@@ -17,31 +17,26 @@ internal static class HttpRequestParser
     /// <summary>
     /// Parses an HTTP request from a sequence of bytes.
     /// </summary>
-    /// <param name="request">Sequence of bytes containing the HTTP request.</param>
-    /// <returns>New instance of the HttpRequest class.</returns>
+    /// <param name="request">The sequence of bytes containing the HTTP request.</param>
+    /// <returns>A new instance of the HttpRequest class.</returns>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="ArgumentException"></exception>
-    internal static HttpRequest ParseFromBytes(IEnumerable<byte> request)
+    public static HttpRequest ParseFromBytes(IEnumerable<byte> request)
     {
         if (request is null)
-            throw new ArgumentNullException(nameof(request),
-                "Request must not be null.");
+            throw new ArgumentNullException(nameof(request), "The request must not be null.");
 
         string requestString = Encoding.ASCII.GetString(request.ToArray());
-
         using StringReader requestStringReader = new(requestString);
+        string? currentLine;
 
-        string? currentLine = requestStringReader.ReadLine();
-
-        if (currentLine is null)
-            throw new ArgumentException("Parse error: start line not found.",
-                nameof(request));
+        currentLine = requestStringReader.ReadLine() ??
+            throw new ArgumentException("Parse error: start line not found.", nameof(request));
 
         Match startLineMatch = Regex.Match(currentLine, StartLinePattern);
 
         if (startLineMatch.Success is false)
-            throw new ArgumentException("Parse error: start line does not match the pattern.",
-                nameof(request));
+            throw new ArgumentException("Parse error: start line does not match pattern.", nameof(request));
 
         List<Match> headerMatches = new();
         string? body = default;
@@ -58,8 +53,7 @@ internal static class HttpRequestParser
             Match headerMatch = Regex.Match(currentLine, HeaderPattern);
 
             if (headerMatch.Success is false)
-                throw new ArgumentException("Parse error: one or more headers do not match the pattern.",
-                    nameof(request));
+                throw new ArgumentException("Parse error: one or more headers do not match the pattern.", nameof(request));
 
             headerMatches.Add(headerMatch);
         }
@@ -72,12 +66,10 @@ internal static class HttpRequestParser
 
         if (startLineMatch.Groups["target"].Value.Contains('?') is true)
         {
-            target =
-                string.Concat(startLineMatch.Groups["target"].Value.TakeWhile(c => c.Equals('?') is false));
+            target = string.Concat(startLineMatch.Groups["target"].Value.TakeWhile(c => c.Equals('?') is false));
 
             string[] queryParameterStrings =
-                string.Concat(startLineMatch.Groups["target"].Value.SkipWhile(c => c.Equals('?') is false)
-                .Skip(1))
+                string.Concat(startLineMatch.Groups["target"].Value.SkipWhile(c => c.Equals('?') is false).Skip(1))
                 .Split(new char[] { '&' }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (string queryParameterString in queryParameterStrings)
@@ -106,8 +98,6 @@ internal static class HttpRequestParser
                 headerMatch.Groups["parameter"].Value,
                 headerMatch.Groups["value"].Value));
 
-        HttpRequest httpRequest = new(method, target, queryParameters, protocolVersion, headers, body);
-
-        return httpRequest;
+        return new HttpRequest(method, target, queryParameters, protocolVersion, headers, body);
     }
 }

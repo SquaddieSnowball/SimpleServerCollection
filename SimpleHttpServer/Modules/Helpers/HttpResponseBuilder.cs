@@ -15,13 +15,13 @@ internal static class HttpResponseBuilder
     {
         try
         {
-            string[] statusStrings =
+            string[] statusCodeMessageStrings =
                 Properties.Resources.HttpResponseStatusMessages.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
 
-            foreach (string statusString in statusStrings)
+            foreach (string statusCodeMessageString in statusCodeMessageStrings)
             {
-                string statusCode = string.Concat(statusString.TakeWhile(c => char.IsDigit(c) is true));
-                string statusMessage = string.Concat(statusString.SkipWhile(c => char.IsDigit(c) is true).Skip(1));
+                string statusCode = string.Concat(statusCodeMessageString.TakeWhile(c => char.IsDigit(c) is true));
+                string statusMessage = string.Concat(statusCodeMessageString.SkipWhile(c => char.IsDigit(c) is true).Skip(1));
 
                 s_statusCodeMessageCollection.Add(statusCode, statusMessage);
             }
@@ -33,34 +33,32 @@ internal static class HttpResponseBuilder
     }
 
     /// <summary>
-    /// Creates an HTTP response from an instance of the HttpResponse class.
+    /// Creates a byte-based HTTP response from an instance of the HttpResponse class.
     /// </summary>
-    /// <param name="response">Instance of the HttpResponse class.</param>
-    /// <returns>Sequence of bytes containing the HTTP response.</returns>
+    /// <param name="response">An instance of the HttpResponse class.</param>
+    /// <returns>A sequence of bytes containing the HTTP response.</returns>
     /// <exception cref="ArgumentNullException"></exception>
-    internal static IEnumerable<byte> Build(HttpResponse response)
+    public static IEnumerable<byte> Build(HttpResponse response)
     {
         if (response is null)
-            throw new ArgumentNullException(nameof(response),
-                "Response must not be null.");
+            throw new ArgumentNullException(nameof(response), "The response must not be null.");
 
         StringBuilder responseStringBuilder = new();
 
         string protocolVersion = response.ProtocolVersion;
         string statusCode = ((int)response.Status).ToString();
-        string statusMessage =
-            s_statusCodeMessageCollection.ContainsKey(statusCode) is true ?
-            s_statusCodeMessageCollection[statusCode] :
-            response.Status.ToString();
+        string statusMessage = s_statusCodeMessageCollection.GetValueOrDefault(statusCode) ?? response.Status.ToString();
 
-        _ = responseStringBuilder.Append("HTTP/" + protocolVersion + ' ' + statusCode + ' ' + statusMessage);
+        _ = responseStringBuilder.Append($"HTTP/{protocolVersion} {statusCode} {statusMessage}");
 
         if (response.Headers is not null)
+        {
             foreach (HttpHeader header in response.Headers.OrderBy(h => h.Group))
-                _ = responseStringBuilder.Append('\n' + header.Parameter + ": " + header.Value);
+                _ = responseStringBuilder.Append($"\n{header.Parameter}: {header.Value}");
+        }
 
         if (string.IsNullOrEmpty(response.Body) is false)
-            _ = responseStringBuilder.Append("\n\n" + response.Body);
+            _ = responseStringBuilder.Append($"\n\n{response.Body}");
 
         byte[] responseBytes = Encoding.ASCII.GetBytes(responseStringBuilder.ToString());
 
