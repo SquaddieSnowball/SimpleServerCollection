@@ -25,7 +25,7 @@ public sealed class TcpServer
     private Exception? _requestHandlingException;
 
     /// <summary>
-    /// Gets the IPAddress representing the local IP address.
+    /// Gets the <see cref="IPAddress"/> representing the local IP address.
     /// </summary>
     public IPAddress IpAddress { get; }
 
@@ -43,15 +43,17 @@ public sealed class TcpServer
         set
         {
             if (value < 1)
+            {
                 throw new ArgumentOutOfRangeException(nameof(value),
                     "The request buffer size value must be greater than 0.");
+            }
 
             _requestBufferSize = value;
         }
     }
 
     /// <summary>
-    /// Gets or sets the timeout for request data.
+    /// Gets or sets the timeout (in milliseconds) for reading request data.
     /// </summary>
     public int RequestReadTimeout
     {
@@ -59,8 +61,10 @@ public sealed class TcpServer
         set
         {
             if (value is not Timeout.Infinite and < 1)
+            {
                 throw new ArgumentOutOfRangeException(nameof(value),
                     "The request read timeout value must be greater than 0 or \"Timeout.Infinite\".");
+            }
 
             _requestReadTimeout = value;
         }
@@ -94,7 +98,7 @@ public sealed class TcpServer
     /// <summary>
     /// Occurs after the request has completed handling.
     /// </summary>
-    public event EventHandler<TcpRequest>? RequestHandling;
+    public event EventHandler<(TcpRequest, TcpResponse?)>? RequestHandling;
 
     /// <summary>
     /// Occurs when request handling fails before a connection is opened.
@@ -107,18 +111,18 @@ public sealed class TcpServer
     public event EventHandler<(TcpConnection, Exception)>? RequestHandlingFailAfterConnection;
 
     /// <summary>
-    /// Initializes a new instance of the TcpServer class that runs a TCP server 
+    /// Initializes a new instance of the <see cref="TcpServer"/> class, that runs a TCP server, 
     /// that listens for requests at the specified local IP address and port number.
     /// </summary>
-    /// <param name="ipAddress">IPAddress representing the local IP address.</param>
+    /// <param name="ipAddress"><see cref="IPAddress"/> representing the local IP address.</param>
     /// <param name="port">The port on which requests will be listened to.</param>
     public TcpServer(IPAddress ipAddress, int port) => (IpAddress, Port) = (ipAddress, port);
 
     /// <summary>
-    /// Initializes a new instance of the TcpServer class that runs a TCP server 
+    /// Initializes a new instance of the <see cref="TcpServer"/> class, that runs a TCP server, 
     /// that listens for requests at the specified local IP address and port number and logs server events.
     /// </summary>
-    /// <param name="ipAddress">IPAddress representing the local IP address.</param>
+    /// <param name="ipAddress"><see cref="IPAddress"/> representing the local IP address.</param>
     /// <param name="port">The port on which requests will be listened to.</param>
     /// <param name="logger">A logger that will be used to log server events.</param>
     public TcpServer(IPAddress ipAddress, int port, ILogger<TcpServer> logger) : this(ipAddress, port) => _logger = logger;
@@ -177,14 +181,18 @@ public sealed class TcpServer
             ServerStop?.Invoke(this, _stopException);
 
             if (_stopException is null)
+            {
                 _logger?.LogInformation(LoggingEvents.ServerStop,
                     "{IpAddress}:{Port} - {EventName}",
                     IpAddress, Port, LoggingEvents.ServerStop.Name);
+            }
             else
+            {
                 _logger?.LogCritical(LoggingEvents.ServerStopException,
                     _stopException,
                     "{IpAddress}:{Port} - {EventName}",
                     IpAddress, Port, LoggingEvents.ServerStopException.Name);
+            }
         }
     }
 
@@ -192,7 +200,7 @@ public sealed class TcpServer
     /// Closes the connection to the server.
     /// </summary>
     /// <param name="connectionId">The ID of the connection to close.</param>
-    /// <returns>true if the connection was closed; otherwise - false.</returns>
+    /// <returns><see langword="true"/> if the connection was closed; otherwise - <see langword="false"/>.</returns>
     public bool CloseConnection(Guid connectionId)
     {
         try
@@ -301,7 +309,7 @@ public sealed class TcpServer
 
         stream.Write(responseBytes, 0, responseBytes.Length);
 
-        RequestHandling?.Invoke(this, request);
+        RequestHandling?.Invoke(this, (request, response));
 
         _logger?.LogInformation(LoggingEvents.RequestHandling,
             "{ConnectionId} - {EventName}. Bytes received: {RequestSize}, bytes sent: {ResponseSize}",
