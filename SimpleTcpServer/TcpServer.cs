@@ -18,11 +18,7 @@ public sealed class TcpServer
     private int _requestReadTimeout = Timeout.Infinite;
 
     private readonly ConcurrentDictionary<Guid, TcpClient> _connectedClients = new();
-
     private readonly ILogger<TcpServer>? _logger;
-
-    private Exception? _stopException;
-    private Exception? _requestHandlingException;
 
     /// <summary>
     /// Gets the <see cref="IPAddress"/> representing the local IP address.
@@ -164,7 +160,7 @@ public sealed class TcpServer
         if (_isServerStarted is false)
             return;
 
-        _stopException = default;
+        Exception? stopException = default;
 
         try
         {
@@ -172,15 +168,15 @@ public sealed class TcpServer
         }
         catch (Exception ex)
         {
-            _stopException = ex;
+            stopException = ex;
         }
         finally
         {
             _isServerStarted = false;
 
-            ServerStop?.Invoke(this, _stopException);
+            ServerStop?.Invoke(this, stopException);
 
-            if (_stopException is null)
+            if (stopException is null)
             {
                 _logger?.LogInformation(LoggingEvents.ServerStop,
                     "{IpAddress}:{Port} - {EventName}",
@@ -189,7 +185,7 @@ public sealed class TcpServer
             else
             {
                 _logger?.LogCritical(LoggingEvents.ServerStopException,
-                    _stopException,
+                    stopException,
                     "{IpAddress}:{Port} - {EventName}",
                     IpAddress, Port, LoggingEvents.ServerStopException.Name);
             }
@@ -227,12 +223,10 @@ public sealed class TcpServer
         }
         catch (Exception ex)
         {
-            _requestHandlingException = ex;
-
-            RequestHandlingFailBeforeConnection?.Invoke(this, _requestHandlingException);
+            RequestHandlingFailBeforeConnection?.Invoke(this, ex);
 
             _logger?.LogCritical(LoggingEvents.RequestHandlingFailBeforeConnection,
-                _requestHandlingException,
+                ex,
                 "{EventName}",
                 LoggingEvents.RequestHandlingFailBeforeConnection.Name);
 
@@ -267,12 +261,10 @@ public sealed class TcpServer
         }
         catch (Exception ex)
         {
-            _requestHandlingException = ex;
-
-            RequestHandlingFailAfterConnection?.Invoke(this, (connection, _requestHandlingException));
+            RequestHandlingFailAfterConnection?.Invoke(this, (connection, ex));
 
             _logger?.LogError(LoggingEvents.RequestHandlingFailAfterConnection,
-                _requestHandlingException,
+                ex,
                 "{ConnectionId} - {EventName}",
                 connection.Id, LoggingEvents.RequestHandlingFailAfterConnection.Name);
         }
