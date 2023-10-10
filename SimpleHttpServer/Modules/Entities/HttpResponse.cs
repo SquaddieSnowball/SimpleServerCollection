@@ -13,6 +13,11 @@ public record class HttpResponse(string ProtocolVersion, HttpResponseStatus Stat
     IEnumerable<HttpHeader> Headers, string? Body = default)
 {
     /// <summary>
+    /// Protocol version of the response.
+    /// </summary>
+    public string ProtocolVersion { get; set; } = ProtocolVersion;
+
+    /// <summary>
     /// Response status.
     /// </summary>
     public HttpResponseStatus Status { get; set; } = Status;

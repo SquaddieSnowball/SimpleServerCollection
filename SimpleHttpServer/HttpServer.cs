@@ -6,6 +6,7 @@ using SimpleHttpServer.Modules.Services;
 using SimpleTcpServer;
 using SimpleTcpServer.Modules.Entities;
 using System.Net;
+using System.Net.Sockets;
 
 namespace SimpleHttpServer;
 
@@ -15,25 +16,23 @@ namespace SimpleHttpServer;
 public sealed class HttpServer
 {
     private readonly TcpServer _tcpServer;
+    private readonly List<HttpEndpoint> _endpoints = new();
+
+    private readonly HttpServerResponseGenerator _responseGenerator;
     private readonly ILogger<HttpServer>? _logger;
-    private readonly Dictionary<string, Action<HttpRequest, HttpResponse>> _endPoints = new();
-    private readonly Dictionary<Guid, Timer> _activeConnections = new();
-    private readonly object _lock = new();
-    private int _connectionTimeout = 60000;
-    private ResponseGenerator? _responseGenerator;
 
     /// <summary>
-    /// Gets an IPAddress that represents the local IP address.
+    /// Gets the <see cref="IPAddress"/> representing the local IP address.
     /// </summary>
     public IPAddress IpAddress { get; }
 
     /// <summary>
-    /// Gets the port on which to listen for request.
+    /// Gets the port on which requests will be listened.
     /// </summary>
     public int Port { get; }
 
     /// <summary>
-    /// Gets the name of the server.
+    /// Gets the server name.
     /// </summary>
     public string Name { get; } = "Simple HTTP server";
 
@@ -47,44 +46,93 @@ public sealed class HttpServer
     /// </summary>
     public int ConnectionTimeout
     {
-        get => _connectionTimeout;
+        get => _tcpServer.RequestReadTimeout;
         set
         {
             if (value is < 1 or > 86400)
+            {
                 throw new ArgumentOutOfRangeException(nameof(value),
-                    "The connection timeout value must be between 1 and 86400.");
+                    "The connection timeout value must be in the range of 1 to 86400.");
+            }
 
-            _connectionTimeout = value * 1000;
+            _tcpServer.RequestReadTimeout = value;
         }
     }
 
     /// <summary>
-    /// Initializes a new instance of the HttpServer class that runs a HTTP server
-    /// which listens for HTTP requests on the specified local IP address and port number.
+    /// Gets or sets a value indicating whether the HTTP "TRACE" method is enabled on the server.
     /// </summary>
-    /// <param name="ipAddress">An IPAddress that represents the local IP address.</param>
-    /// <param name="port">The port on which to listen for request.</param>
+    public bool IsTraceEnabled { get; set; }
+
+    /// <summary>
+    /// Occurs when the server starts.
+    /// </summary>
+    public event EventHandler? ServerStart;
+
+    /// <summary>
+    /// Occurs when the server is stopped.
+    /// </summary>
+    public event EventHandler<Exception?>? ServerStop;
+
+    /// <summary>
+    /// Occurs when a TCP connection is opened.
+    /// </summary>
+    public event EventHandler<TcpConnection>? TcpConnectionOpen;
+
+    /// <summary>
+    /// Occurs when the TCP connection is closed.
+    /// </summary>
+    public event EventHandler<TcpConnection>? TcpConnectionClose;
+
+    /// <summary>
+    /// Occurs after the TCP request has completed handling.
+    /// </summary>
+    public event EventHandler<(TcpRequest, TcpResponse?)>? TcpRequestHandling;
+
+    /// <summary>
+    /// Occurs when TCP request handling fails before a connection is opened.
+    /// </summary>
+    public event EventHandler<Exception>? TcpRequestHandlingFailBeforeConnection;
+
+    /// <summary>
+    /// Occurs when TCP request handling fails after the connection is opened.
+    /// </summary>
+    public event EventHandler<(TcpConnection, Exception)>? TcpRequestHandlingFailAfterConnection;
+
+    /// <summary>
+    /// Occurs after the HTTP request has completed handling.
+    /// </summary>
+    public event EventHandler<(HttpRequest?, HttpResponse?)>? HttpRequestHandling;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HttpServer"/> class, that runs an HTTP server, 
+    /// that listens for requests at the specified local IP address and port number.
+    /// </summary>
+    /// <param name="ipAddress"><see cref="IPAddress"/> representing the local IP address.</param>
+    /// <param name="port">The port on which requests will be listened to.</param>
     public HttpServer(IPAddress ipAddress, int port)
     {
-        (IpAddress, Port) = (ipAddress, port);
+        (_tcpServer, _responseGenerator, IpAddress, Port) = (
+            new TcpServer(ipAddress, port)
+            {
+                RequestReadTimeout = 60000,
+                RequestHandler = HandleTcpRequest
+            },
+            new HttpServerResponseGenerator(this),
+            ipAddress,
+            port);
 
-        _tcpServer = new TcpServer(ipAddress, port)
-        {
-            RequestHandler = HandleTcpRequest
-        };
-
-        SubscribeToTcpServerEvents();
+        ManageTcpServerEvents();
     }
 
     /// <summary>
-    /// Initializes a new instance of the HttpServer class that runs a HTTP server
-    /// which listens for HTTP requests on the specified local IP address and port number.
+    /// Initializes a new instance of the <see cref="HttpServer"/> class, that runs an HTTP server, 
+    /// that listens for requests at the specified local IP address and port number and logs server events.
     /// </summary>
-    /// <param name="ipAddress">An IPAddress that represents the local IP address.</param>
-    /// <param name="port">The port on which to listen for request.</param>
-    /// <param name="logger">The logger that will be used to log events.</param>
-    public HttpServer(IPAddress ipAddress, int port, ILogger<HttpServer> logger) : this(ipAddress, port) =>
-        _logger = logger;
+    /// <param name="ipAddress"><see cref="IPAddress"/> representing the local IP address.</param>
+    /// <param name="port">The port on which requests will be listened to.</param>
+    /// <param name="logger">A logger that will be used to log server events.</param>
+    public HttpServer(IPAddress ipAddress, int port, ILogger<HttpServer> logger) : this(ipAddress, port) => _logger = logger;
 
     /// <summary>
     /// Starts the server.
@@ -104,101 +152,256 @@ public sealed class HttpServer
     /// <summary>
     /// Stops the server.
     /// </summary>
-    public void Stop() =>
-        _tcpServer.Stop();
+    public void Stop() => _tcpServer.Stop();
 
     /// <summary>
-    /// Adds an end point and it's handler to the HTTP server.
+    /// Maps the target and request handler for the HTTP "GET" method.
     /// </summary>
-    /// <param name="target">Target of an end point.</param>
-    /// <param name="handler">End point handler.</param>
-    /// <returns>The current instance of the HttpServer class.</returns>
-    /// <exception cref="ArgumentException"></exception>
-    /// <exception cref="ArgumentNullException"></exception>
-    public HttpServer AddEndPoint(string target, Action<HttpRequest, HttpResponse> handler)
+    /// <param name="target">Target of the request.</param>
+    /// <param name="handler">Request handler.</param>
+    /// <returns>The current instance of the <see cref="HttpServer"/> class.</returns>
+    public HttpServer MapGet(string target, Func<HttpRequest, HttpResponse> handler) =>
+        AddEndpoint(target, HttpRequestMethod.GET, handler);
+
+    /// <summary>
+    /// Maps the target and request handler for the HTTP "HEAD" method.
+    /// </summary>
+    /// <param name="target">Target of the request.</param>
+    /// <param name="handler">Request handler.</param>
+    /// <returns>The current instance of the <see cref="HttpServer"/> class.</returns>
+    public HttpServer MapHead(string target, Func<HttpRequest, HttpResponse> handler) =>
+        AddEndpoint(target, HttpRequestMethod.HEAD, handler);
+
+    /// <summary>
+    /// Maps the target and request handler for the HTTP "POST" method.
+    /// </summary>
+    /// <param name="target">Target of the request.</param>
+    /// <param name="handler">Request handler.</param>
+    /// <returns>The current instance of the <see cref="HttpServer"/> class.</returns>
+    public HttpServer MapPost(string target, Func<HttpRequest, HttpResponse> handler) =>
+        AddEndpoint(target, HttpRequestMethod.POST, handler);
+
+    /// <summary>
+    /// Maps the target and request handler for the HTTP "PUT" method.
+    /// </summary>
+    /// <param name="target">Target of the request.</param>
+    /// <param name="handler">Request handler.</param>
+    /// <returns>The current instance of the <see cref="HttpServer"/> class.</returns>
+    public HttpServer MapPut(string target, Func<HttpRequest, HttpResponse> handler) =>
+        AddEndpoint(target, HttpRequestMethod.PUT, handler);
+
+    /// <summary>
+    /// Maps the target and request handler for the HTTP "PATCH" method.
+    /// </summary>
+    /// <param name="target">Target of the request.</param>
+    /// <param name="handler">Request handler.</param>
+    /// <returns>The current instance of the <see cref="HttpServer"/> class.</returns>
+    public HttpServer MapPatch(string target, Func<HttpRequest, HttpResponse> handler) =>
+        AddEndpoint(target, HttpRequestMethod.PATCH, handler);
+
+    /// <summary>
+    /// Maps the target and request handler for the HTTP "DELETE" method.
+    /// </summary>
+    /// <param name="target">Target of the request.</param>
+    /// <param name="handler">Request handler.</param>
+    /// <returns>The current instance of the <see cref="HttpServer"/> class.</returns>
+    public HttpServer MapDelete(string target, Func<HttpRequest, HttpResponse> handler) =>
+        AddEndpoint(target, HttpRequestMethod.DELETE, handler);
+
+    /// <summary>
+    /// Maps the target and request handler for the HTTP "OPTIONS" method.
+    /// </summary>
+    /// <param name="target">Target of the request.</param>
+    /// <param name="handler">Request handler.</param>
+    /// <returns>The current instance of the <see cref="HttpServer"/> class.</returns>
+    public HttpServer MapOptions(string target, Func<HttpRequest, HttpResponse> handler) =>
+        AddEndpoint(target, HttpRequestMethod.OPTIONS, handler);
+
+    private HttpServer AddEndpoint(string target, HttpRequestMethod requestMethod, Func<HttpRequest, HttpResponse> handler)
     {
         if (string.IsNullOrEmpty(target) is true)
-            throw new ArgumentException("Target must not be null or empty.",
-                nameof(target));
+            throw new ArgumentException("The target must not be null or empty.", nameof(target));
 
         if (handler is null)
-            throw new ArgumentNullException(nameof(handler),
-                "Handler must not be null.");
+            throw new ArgumentNullException(nameof(handler), "The handler must not be null.");
+
+        HttpEndpoint? endpoint = _endpoints.FirstOrDefault(e => e.Target.Equals(target, StringComparison.Ordinal));
+
+        if (endpoint is null)
+        {
+            endpoint = new HttpEndpoint(target);
+            _endpoints.Add(endpoint);
+        }
 
         try
         {
-            _endPoints.Add(target, handler);
+            endpoint.AddRequestMethodHandler(requestMethod, handler);
         }
-        catch (ArgumentException)
+        catch
         {
-            throw new ArgumentException("The specified endpoint is already assigned.",
-                nameof(target));
+            throw;
         }
 
         return this;
     }
 
-    private void SubscribeToTcpServerEvents()
+    private void ManageTcpServerEvents()
     {
-        _tcpServer.ServerStart += (sender, e) =>
-            _logger?.LogInformation(LoggingEvents.ServerStart, "{EventName} at {IpAddress}:{Port}",
-                LoggingEvents.ServerStart.Name, IpAddress, Port);
+        _tcpServer.ServerStart += TcpServerOnServerStart;
+        _tcpServer.ServerStop += TcpServerOnServerStop;
+        _tcpServer.ConnectionOpen += TcpServerOnConnectionOpen;
+        _tcpServer.ConnectionClose += TcpServerOnConnectionClose;
+        _tcpServer.RequestHandling += TcpServerOnRequestHandling;
+        _tcpServer.RequestHandlingFailBeforeConnection += TcpServerOnRequestHandlingFailBeforeConnection;
+        _tcpServer.RequestHandlingFailAfterConnection += TcpServerOnRequestHandlingFailAfterConnection;
+    }
 
-        _tcpServer.ServerStop += (sender, e) =>
+    private void TcpServerOnServerStart(object? sender, EventArgs e)
+    {
+        ServerStart?.Invoke(this, e);
+
+        _logger?.LogInformation(LoggingEvents.ServerStart,
+            "{IpAddress}:{Port} - {EventName}",
+            IpAddress, Port, LoggingEvents.ServerStart.Name);
+    }
+
+    private void TcpServerOnServerStop(object? sender, Exception? e)
+    {
+        ServerStop?.Invoke(this, e);
+
+        if (e is null)
         {
-            if (e is null)
-                _logger?.LogInformation(LoggingEvents.ServerStop, "{EventName} at {IpAddress}:{Port}",
-                    LoggingEvents.ServerStop.Name, IpAddress, Port);
-            else
-                _logger?.LogCritical(LoggingEvents.ServerStopException, e, "{EventName} at {IpAddress}:{Port}",
-                    LoggingEvents.ServerStopException.Name, IpAddress, Port);
-        };
-
-        _tcpServer.ConnectionOpen += (sender, e) =>
-            _logger?.LogInformation(LoggingEvents.ConnectionOpen, "{EventName} on {IpAddress}:{Port} (ID: {ConnectionId})",
-                LoggingEvents.ConnectionOpen.Name, e.RemoteEndPoint.Address,
-                e.RemoteEndPoint.Port, e.Id);
-
-        _tcpServer.ConnectionClose += (sender, e) =>
+            _logger?.LogInformation(LoggingEvents.ServerStop,
+                "{IpAddress}:{Port} - {EventName}",
+                IpAddress, Port, LoggingEvents.ServerStop.Name);
+        }
+        else
         {
-            lock (_lock)
-            {
-                if (_activeConnections.ContainsKey(e.Id) is true)
-                {
-                    _activeConnections[e.Id].Dispose();
-                    _ = _activeConnections.Remove(e.Id);
-                }
-            }
+            _logger?.LogCritical(LoggingEvents.ServerStopException,
+                e,
+                "{IpAddress}:{Port} - {EventName}",
+                IpAddress, Port, LoggingEvents.ServerStopException.Name);
+        }
+    }
 
-            _logger?.LogInformation(LoggingEvents.ConnectionClose, "{EventName} (ID: {ConnectionId})",
-                LoggingEvents.ConnectionClose.Name, e.Id);
-        };
+    private void TcpServerOnConnectionOpen(object? sender, TcpConnection e)
+    {
+        TcpConnectionOpen?.Invoke(this, e);
 
-        _tcpServer.RequestHandling += (sender, e) =>
-            _logger?.LogInformation(LoggingEvents.RequestHandling, "{EventName} (Conndection ID: {ConnectionId})",
-                LoggingEvents.RequestHandling.Name, e.Connection.Id);
+        _logger?.LogInformation(LoggingEvents.TcpConnectionOpen,
+            "{TcpConnectionId} - {EventName}",
+            e.Id, LoggingEvents.TcpConnectionOpen.Name);
+    }
 
-        _tcpServer.RequestHandlingFailBeforeConnection += (sender, e) =>
-            _logger?.LogCritical(LoggingEvents.RequestHandlingFailBeforeConnection, e,
-                "{EventName}", LoggingEvents.RequestHandlingFailBeforeConnection.Name);
+    private void TcpServerOnConnectionClose(object? sender, TcpConnection e)
+    {
+        TcpConnectionClose?.Invoke(this, e);
 
-        _tcpServer.RequestHandlingFailAfterConnection += (sender, e) =>
-            _logger?.LogError(LoggingEvents.RequestHandlingFailAfterConnection, e.Item1,
-                "{EventName} (Conndection ID: {ConnectionId})",
-                LoggingEvents.RequestHandlingFailAfterConnection.Name, e.Item2.Id);
+        _logger?.LogInformation(LoggingEvents.TcpConnectionClose,
+            "{TcpConnectionId} - {EventName}",
+            e.Id, LoggingEvents.TcpConnectionClose.Name);
+    }
+
+    private void TcpServerOnRequestHandling(object? sender, (TcpRequest, TcpResponse?) e)
+    {
+        TcpRequestHandling?.Invoke(this, e);
+
+        _logger?.LogInformation(LoggingEvents.TcpRequestHandling,
+            "{TcpConnectionId} - {EventName}. Bytes received: {TcpRequestSize}, bytes sent: {TcpResponseSize}",
+            e.Item1.Connection.Id, LoggingEvents.TcpRequestHandling.Name, e.Item1.Body.Count(), e.Item2?.Body?.Count() ?? 0);
+    }
+
+    private void TcpServerOnRequestHandlingFailBeforeConnection(object? sender, Exception e)
+    {
+        TcpRequestHandlingFailBeforeConnection?.Invoke(this, e);
+
+        _logger?.LogCritical(LoggingEvents.TcpRequestHandlingFailBeforeConnection,
+            e,
+            "{EventName}",
+            LoggingEvents.TcpRequestHandlingFailBeforeConnection.Name);
+    }
+
+    private void TcpServerOnRequestHandlingFailAfterConnection(object? sender, (TcpConnection, Exception) e)
+    {
+        TcpRequestHandlingFailAfterConnection?.Invoke(this, (e.Item1, e.Item2));
+
+        switch ((e.Item2.InnerException as SocketException)?.SocketErrorCode)
+        {
+            case SocketError.TimedOut:
+
+                _logger?.LogWarning(LoggingEvents.TcpRequestHandlingFailAfterConnection,
+                    "{TcpConnectionId} - {EventName}: \"Connection timed out\"",
+                    e.Item1.Id, LoggingEvents.TcpRequestHandlingFailAfterConnection.Name);
+
+                break;
+            case SocketError.ConnectionReset:
+
+                _logger?.LogWarning(LoggingEvents.TcpRequestHandlingFailAfterConnection,
+                    "{TcpConnectionId} - {EventName}: \"Connection closed by remote host\"",
+                    e.Item1.Id, LoggingEvents.TcpRequestHandlingFailAfterConnection.Name);
+
+                break;
+            default:
+
+                _logger?.LogError(LoggingEvents.TcpRequestHandlingFailAfterConnection,
+                    e.Item2,
+                    "{TcpConnectionId} - {EventName}",
+                    e.Item1.Id, LoggingEvents.TcpRequestHandlingFailAfterConnection.Name);
+
+                break;
+        }
     }
 
     private TcpResponse HandleTcpRequest(TcpRequest tcpRequest)
     {
-        if (tcpRequest.Body.Any() is false)
-            return new TcpResponse(Array.Empty<byte>());
+        TcpResponse tcpResponse;
 
-        _responseGenerator ??= new(this);
+        if ((ValidateTcpRequest(tcpRequest, out HttpRequest? httpRequest, out HttpResponse? httpResponse) is false) ||
+            (ValidateHttpRequest(httpRequest!, out httpResponse) is false) ||
+            (HandleHttpRequest(httpRequest!, out httpResponse) is true))
+            tcpResponse = new TcpResponse(HttpResponseBuilder.Build(httpResponse!));
+        else
+        {
+            httpResponse = _endpoints
+                .First(e => e.Target.Equals(httpRequest!.Target, StringComparison.Ordinal) is true)
+                .RequestMethodHandlerCollection.First(mh => mh.Key.Equals(httpRequest!.Method) is true)
+                .Value(httpRequest!);
 
-        HttpRequest httpRequest;
-        HttpResponse httpResponse;
+            if (httpResponse is null)
+                tcpResponse = new TcpResponse(Array.Empty<byte>());
+            else
+            {
+                SupplementHttpResponse(httpRequest!, httpResponse);
 
-        TcpResponse? tcpResponse;
+                bool keepConnectionAlive = ManageHttpConnection(httpRequest!, httpResponse);
+
+                tcpResponse = new TcpResponse(HttpResponseBuilder.Build(httpResponse))
+                {
+                    KeepConnectionAlive = keepConnectionAlive
+                };
+            }
+        }
+
+        HttpRequestHandling?.Invoke(this, (httpRequest, httpResponse));
+
+        _logger?.LogInformation(LoggingEvents.HttpRequestHandling,
+            "{TcpConnectionId} - {EventName}. Request info: {HttpRequestInfo}, response info: {HttpResponseInfo}",
+            tcpRequest.Connection.Id,
+            LoggingEvents.HttpRequestHandling.Name,
+            (httpRequest is null) ?
+                "\"Invalid HTTP request\"" :
+                $"\"{httpRequest.Method} {httpRequest.Target} HTTP/{httpRequest.ProtocolVersion}\"",
+            (httpResponse is null) ?
+                "\"Invalid HTTP response\"" :
+                $"\"HTTP/{httpResponse.ProtocolVersion} {(int)httpResponse.Status} {httpResponse.Status}\"");
+
+        return tcpResponse;
+    }
+
+    private bool ValidateTcpRequest(TcpRequest tcpRequest, out HttpRequest? httpRequest, out HttpResponse? httpResponse)
+    {
+        httpRequest = default;
+        httpResponse = default;
 
         try
         {
@@ -206,91 +409,156 @@ public sealed class HttpServer
         }
         catch (ArgumentException)
         {
-            return _responseGenerator.GenerateBadRequestResponse();
+            httpResponse = _responseGenerator.GenerateBadRequest();
+
+            return false;
         }
 
-        tcpResponse = ValidateHttpRequest(httpRequest);
-
-        if (tcpResponse is not null)
-            return tcpResponse;
-
-        httpResponse = new HttpResponse(httpRequest.ProtocolVersion, HttpResponseStatus.OK, Enumerable.Empty<HttpHeader>());
-
-        tcpResponse = httpRequest.Method switch
-        {
-            HttpRequestMethod.GET => HandleHttpGetRequest(httpRequest, httpResponse),
-            HttpRequestMethod.HEAD => HandleHttpHeadRequest(httpRequest, httpResponse),
-            _ => _responseGenerator.GenerateNotImplementedResponse(httpRequest)
-        };
-
-        ManageConnection(httpResponse, tcpRequest, tcpResponse);
-
-        return tcpResponse;
+        return true;
     }
 
-    private TcpResponse? ValidateHttpRequest(HttpRequest httpRequest)
-    {
-        HttpHeader? hostHeader =
-            httpRequest.Headers.FirstOrDefault(h => h.Parameter.Equals("Host", StringComparison.Ordinal));
-        HttpHeader? connectionHeader =
-            httpRequest.Headers.FirstOrDefault(h => h.Parameter.Equals("Connection", StringComparison.Ordinal));
+    private bool ValidateHttpRequest(HttpRequest httpRequest, out HttpResponse? httpResponse) =>
+        (ValidateHttpRequestGeneral(httpRequest, out httpResponse) is true) &&
+        ((httpRequest.ProtocolVersion is not "1.1") || (ValidateHttpRequest11(httpRequest, out httpResponse) is true));
 
-        if (httpRequest.Method is HttpRequestMethod.NOTIMPLEMENTED)
-            return _responseGenerator!.GenerateNotImplementedResponse(httpRequest);
+    private bool ValidateHttpRequestGeneral(HttpRequest httpRequest, out HttpResponse? httpResponse)
+    {
+        httpResponse = default;
 
         if (SupportedProtocolVersions.Contains(httpRequest.ProtocolVersion) is false)
-            return _responseGenerator!.GenerateHttpVersionNotSupportedResponse();
+            httpResponse = _responseGenerator.GenerateHttpVersionNotSupported();
+        else if (httpRequest.Method is HttpRequestMethod.NOTIMPLEMENTED)
+            httpResponse = _responseGenerator.GenerateNotImplemented(httpRequest);
 
-        if ((hostHeader is null) && (httpRequest.ProtocolVersion is not "1.0"))
-            return _responseGenerator!.GenerateBadRequestResponse();
-
-        if ((connectionHeader is null) && (httpRequest.ProtocolVersion is not "1.0"))
-            return _responseGenerator!.GenerateBadRequestResponse();
-
-        if ((connectionHeader is not null) && (connectionHeader.Value is not ("keep-alive" or "close")))
-            return _responseGenerator!.GenerateBadRequestResponse();
-
-        if (_endPoints.ContainsKey(httpRequest.Target) is false)
-            return _responseGenerator!.GenerateNotFoundResponse(httpRequest);
-
-        return default;
+        return httpResponse is null;
     }
 
-    private TcpResponse HandleHttpGetRequest(HttpRequest httpRequest, HttpResponse httpResponse)
+    private bool ValidateHttpRequest11(HttpRequest httpRequest, out HttpResponse? httpResponse)
     {
-        _endPoints[httpRequest.Target](httpRequest, httpResponse);
-        _responseGenerator!.AttachResponseHeaders(httpResponse, httpRequest);
+        httpResponse = default;
 
-        return new TcpResponse(HttpResponseBuilder.Build(httpResponse));
+        IEnumerable<HttpHeader> hostHeaders = httpRequest.Headers.Where(h => h.Parameter is "Host");
+        IEnumerable<HttpHeader> connectionHeaders = httpRequest.Headers.Where(h => h.Parameter is "Connection");
+
+        if ((hostHeaders.Count() is not 1) || (connectionHeaders.Count() is not 1) ||
+            (connectionHeaders.First().Value is not ("keep-alive" or "close")))
+            httpResponse = _responseGenerator.GenerateBadRequest(httpRequest);
+
+        return httpResponse is null;
     }
 
-    private TcpResponse HandleHttpHeadRequest(HttpRequest httpRequest, HttpResponse httpResponse)
+    private bool HandleHttpRequest(HttpRequest httpRequest, out HttpResponse? httpResponse)
     {
-        _endPoints[httpRequest.Target](httpRequest, httpResponse);
-        _responseGenerator!.AttachResponseHeaders(httpResponse, httpRequest);
-        httpResponse.Body = default;
-
-        return new TcpResponse(HttpResponseBuilder.Build(httpResponse));
-    }
-
-    private void ManageConnection(HttpResponse httpResponse, TcpRequest tcpRequest, TcpResponse tcpResponse)
-    {
-        HttpHeader? connectionHeader =
-            httpResponse.Headers.FirstOrDefault(h => h.Parameter.Equals("Connection", StringComparison.Ordinal) is true);
-
-        if ((connectionHeader is not null) && (connectionHeader.Value.Equals("keep-alive", StringComparison.Ordinal) is true))
+        if (HandleHttpServerRequest(httpRequest, out httpResponse) is false)
         {
-            lock (_lock)
-            {
-                if (_activeConnections.ContainsKey(tcpRequest.Connection.Id) is true)
-                    _ = _activeConnections[tcpRequest.Connection.Id].Change(_connectionTimeout, Timeout.Infinite);
-                else
-                    _activeConnections.Add(tcpRequest.Connection.Id,
-                        new Timer(state => _ = _tcpServer.CloseConnection((Guid)state!),
-                        tcpRequest.Connection.Id, _connectionTimeout, Timeout.Infinite));
-            }
+            HttpEndpoint? endpoint = _endpoints
+                .FirstOrDefault(e => e.Target.Equals(httpRequest.Target, StringComparison.Ordinal) is true);
 
-            tcpResponse.KeepConnectionAlive = true;
+            if (endpoint is null)
+                httpResponse = _responseGenerator.GenerateNotFound(httpRequest);
+            else if (endpoint.RequestMethodHandlerCollection.Any(mh => mh.Key.Equals(httpRequest.Method) is true) is false)
+            {
+                httpResponse = _responseGenerator
+                    .GenerateMethodNotAllowed(httpRequest, endpoint.RequestMethodHandlerCollection.Select(mh => mh.Key));
+            }
         }
+
+        return httpResponse is not null;
+    }
+
+    private bool HandleHttpServerRequest(HttpRequest httpRequest, out HttpResponse? httpResponse)
+    {
+        httpResponse = default;
+
+        if ((httpRequest.Method is HttpRequestMethod.OPTIONS) && (httpRequest.Target is "*"))
+            httpResponse = HandleHttpOptionsRequest(httpRequest);
+        else if (httpRequest.Method is HttpRequestMethod.TRACE)
+            httpResponse = HandleHttpTraceRequest(httpRequest);
+
+        return httpResponse is not null;
+    }
+
+    private HttpResponse HandleHttpOptionsRequest(HttpRequest httpRequest) =>
+        new(
+            httpRequest.ProtocolVersion,
+            HttpResponseStatus.OK,
+            _responseGenerator.GeneralServerHeaders.Concat(new HttpHeader[]
+            {
+                new HttpHeader(
+                    HttpHeaderGroup.Response,
+                    "Allow",
+                    (_endpoints.Any() is true) ?
+                    string.Join(", ", _endpoints
+                        .Select(e => e.RequestMethodHandlerCollection.Select(mh => mh.Key))
+                        .Aggregate((me1, me2) => me1.Concat(me2))
+                        .Distinct()
+                        .OrderBy(m => m)) :
+                    string.Empty)
+            }));
+
+    private HttpResponse HandleHttpTraceRequest(HttpRequest httpRequest) =>
+        (IsTraceEnabled is true) ?
+        new HttpResponse(
+            httpRequest.ProtocolVersion,
+            HttpResponseStatus.OK,
+            _responseGenerator.GeneralServerHeaders.Concat(new HttpHeader[]
+            {
+                new HttpHeader(
+                    HttpHeaderGroup.Representation,
+                    "Content-Type",
+                    "message/http"),
+                new HttpHeader(
+                    HttpHeaderGroup.Payload,
+                    "Content-Length",
+                    httpRequest.RawRequest.Length.ToString())
+            }),
+            httpRequest.RawRequest) :
+        _responseGenerator.GenerateNotImplemented(httpRequest);
+
+    private void SupplementHttpResponse(HttpRequest httpRequest, HttpResponse httpResponse)
+    {
+        if (string.IsNullOrEmpty(httpResponse.ProtocolVersion) is true)
+            httpResponse.ProtocolVersion = httpRequest.ProtocolVersion;
+
+        httpResponse.Headers ??= new List<HttpHeader>();
+
+        IEnumerable<HttpHeader> generalResponseHeaders = _responseGenerator.GeneralServerHeaders.Concat(new HttpHeader[]
+        {
+            new HttpHeader(HttpHeaderGroup.Payload, "Content-Length", (httpResponse.Body?.Length ?? 0).ToString())
+        });
+
+        List<HttpHeader> responseHeadersToAttach = new();
+
+        foreach (HttpHeader responseHeader in generalResponseHeaders)
+        {
+            if (httpResponse.Headers.Any(h => h.Parameter?.Equals(responseHeader.Parameter, StringComparison.Ordinal) is true))
+                continue;
+
+            responseHeadersToAttach.Add(responseHeader);
+        }
+
+        httpResponse.Headers = httpResponse.Headers.Concat(responseHeadersToAttach);
+    }
+
+    private static bool ManageHttpConnection(HttpRequest httpRequest, HttpResponse httpResponse)
+    {
+        bool keepConnectionAlive = false;
+
+        HttpHeader? connectionHeader = httpRequest.Headers.FirstOrDefault(h => h.Parameter is "Connection");
+
+        if (connectionHeader is not null)
+        {
+            keepConnectionAlive = connectionHeader.Value is "keep-alive";
+
+            httpResponse.Headers = httpResponse.Headers.Concat(new HttpHeader[]
+            {
+                new HttpHeader(
+                    HttpHeaderGroup.Response,
+                    "Connection",
+                    (keepConnectionAlive is true) ? "keep-alive" : "close")
+            });
+        }
+
+        return keepConnectionAlive;
     }
 }

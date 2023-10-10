@@ -61,6 +61,16 @@ namespace SimpleHttpServer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Representation: Content-Type, Content-Encoding, Content-Language, Content-Location
+        ///Payload: Content-Length, Content-Range, Trailer, Transfer-Encoding.
+        /// </summary>
+        internal static string HttpHeaderGroupDetails {
+            get {
+                return ResourceManager.GetString("HttpHeaderGroupDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 100 Continue
         ///101 Switching Protocols
         ///102 Processing
@@ -98,125 +108,280 @@ namespace SimpleHttpServer.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
-        ///&lt;html&gt;
+        ///
+        ///&lt;html lang=&quot;en&quot;&gt;
         ///
         ///&lt;head&gt;
-        ///    &lt;title&gt;
-        ///        400 Bad Request
-        ///    &lt;/title&gt;
+        ///    &lt;meta charset=&quot;utf-8&quot;&gt;
+        ///    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;
+        ///    &lt;style&gt;
+        ///        body {
+        ///            text-align: center;
+        ///        }
+        ///    &lt;/style&gt;
+        ///    &lt;title&gt;400 Bad Request&lt;/title&gt;
         ///&lt;/head&gt;
         ///
-        ///&lt;body style=&quot;text-align: center;&quot;&gt;
-        ///    &lt;h1&gt;
-        ///        400 Bad Request
-        ///    &lt;/h1&gt;
-        ///    &lt;p&gt;
-        ///        The server cannot process the request due to a client error
-        ///    &lt;/p&gt;
+        ///&lt;body&gt;
+        ///    &lt;h1&gt;400 Bad Request&lt;/h1&gt;
+        ///    &lt;p&gt;Your client sent an illegal request&lt;/p&gt;
         ///    &lt;hr&gt;
-        ///    &lt;p&gt;
-        ///        Simple HTTP server
-        ///    &lt;/p&gt;
+        ///    &lt;p&gt;Simple HTTP server&lt;/p&gt;
         ///&lt;/body&gt;
         ///
         ///&lt;/html&gt;.
         /// </summary>
-        internal static string ServerResponsePage400 {
+        internal static string HttpServerResponsePage400 {
             get {
-                return ResourceManager.GetString("ServerResponsePage400", resourceCulture);
+                return ResourceManager.GetString("HttpServerResponsePage400", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
-        ///&lt;html&gt;
+        ///
+        ///&lt;html lang=&quot;en&quot;&gt;
         ///
         ///&lt;head&gt;
-        ///    &lt;title&gt;
-        ///        404 Not Found
-        ///    &lt;/title&gt;
+        ///    &lt;meta charset=&quot;utf-8&quot;&gt;
+        ///    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;
+        ///    &lt;style&gt;
+        ///        body {
+        ///            text-align: center;
+        ///        }
+        ///    &lt;/style&gt;
+        ///    &lt;title&gt;401 Unauthorized&lt;/title&gt;
         ///&lt;/head&gt;
         ///
-        ///&lt;body style=&quot;text-align: center;&quot;&gt;
-        ///    &lt;h1&gt;
-        ///        404 Not Found
-        ///    &lt;/h1&gt;
-        ///    &lt;p&gt;
-        ///        The server cannot find the requested resource
-        ///    &lt;/p&gt;
+        ///&lt;body&gt;
+        ///    &lt;h1&gt;401 Unauthorized&lt;/h1&gt;
+        ///    &lt;p&gt;You don&apos;t have permission to access this resource using the credentials you provided&lt;/p&gt;
         ///    &lt;hr&gt;
-        ///    &lt;p&gt;
-        ///        Simple HTTP server
-        ///    &lt;/p&gt;
+        ///    &lt;p&gt;Simple HTTP server&lt;/p&gt;
         ///&lt;/body&gt;
         ///
         ///&lt;/html&gt;.
         /// </summary>
-        internal static string ServerResponsePage404 {
+        internal static string HttpServerResponsePage401 {
             get {
-                return ResourceManager.GetString("ServerResponsePage404", resourceCulture);
+                return ResourceManager.GetString("HttpServerResponsePage401", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
-        ///&lt;html&gt;
+        ///
+        ///&lt;html lang=&quot;en&quot;&gt;
         ///
         ///&lt;head&gt;
-        ///    &lt;title&gt;
-        ///        501 Not Implemented
-        ///    &lt;/title&gt;
+        ///    &lt;meta charset=&quot;utf-8&quot;&gt;
+        ///    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;
+        ///    &lt;style&gt;
+        ///        body {
+        ///            text-align: center;
+        ///        }
+        ///    &lt;/style&gt;
+        ///    &lt;title&gt;403 Forbidden&lt;/title&gt;
         ///&lt;/head&gt;
         ///
-        ///&lt;body style=&quot;text-align: center;&quot;&gt;
-        ///    &lt;h1&gt;
-        ///        501 Not Implemented
-        ///    &lt;/h1&gt;
-        ///    &lt;p&gt;
-        ///        The server does not support the functionality required to fulfill the request
-        ///    &lt;/p&gt;
+        ///&lt;body&gt;
+        ///    &lt;h1&gt;403 Forbidden&lt;/h1&gt;
+        ///    &lt;p&gt;You don&apos;t have permission to access this resource&lt;/p&gt;
         ///    &lt;hr&gt;
-        ///    &lt;p&gt;
-        ///        Simple HTTP server
-        ///    &lt;/p&gt;
+        ///    &lt;p&gt;Simple HTTP server&lt;/p&gt;
         ///&lt;/body&gt;
         ///
         ///&lt;/html&gt;.
         /// </summary>
-        internal static string ServerResponsePage501 {
+        internal static string HttpServerResponsePage403 {
             get {
-                return ResourceManager.GetString("ServerResponsePage501", resourceCulture);
+                return ResourceManager.GetString("HttpServerResponsePage403", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
-        ///&lt;html&gt;
+        ///
+        ///&lt;html lang=&quot;en&quot;&gt;
         ///
         ///&lt;head&gt;
-        ///    &lt;title&gt;
-        ///        505 HTTP Version Not Supported
-        ///    &lt;/title&gt;
+        ///    &lt;meta charset=&quot;utf-8&quot;&gt;
+        ///    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;
+        ///    &lt;style&gt;
+        ///        body {
+        ///            text-align: center;
+        ///        }
+        ///    &lt;/style&gt;
+        ///    &lt;title&gt;404 Not Found&lt;/title&gt;
         ///&lt;/head&gt;
         ///
-        ///&lt;body style=&quot;text-align: center;&quot;&gt;
-        ///    &lt;h1&gt;
-        ///        505 HTTP Version Not Supported
-        ///    &lt;/h1&gt;
-        ///    &lt;p&gt;
-        ///        The HTTP version used in the request is not supported by the server
-        ///    &lt;/p&gt;
+        ///&lt;body&gt;
+        ///    &lt;h1&gt;404 Not Found&lt;/h1&gt;
+        ///    &lt;p&gt;The requested URL was not found on the server&lt;/p&gt;
         ///    &lt;hr&gt;
-        ///    &lt;p&gt;
-        ///        Simple HTTP server
-        ///    &lt;/p&gt;
+        ///    &lt;p&gt;Simple HTTP server&lt;/p&gt;
         ///&lt;/body&gt;
         ///
         ///&lt;/html&gt;.
         /// </summary>
-        internal static string ServerResponsePage505 {
+        internal static string HttpServerResponsePage404 {
             get {
-                return ResourceManager.GetString("ServerResponsePage505", resourceCulture);
+                return ResourceManager.GetString("HttpServerResponsePage404", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
+        ///
+        ///&lt;html lang=&quot;en&quot;&gt;
+        ///
+        ///&lt;head&gt;
+        ///    &lt;meta charset=&quot;utf-8&quot;&gt;
+        ///    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;
+        ///    &lt;style&gt;
+        ///        body {
+        ///            text-align: center;
+        ///        }
+        ///    &lt;/style&gt;
+        ///    &lt;title&gt;405 Method Not Allowed&lt;/title&gt;
+        ///&lt;/head&gt;
+        ///
+        ///&lt;body&gt;
+        ///    &lt;h1&gt;405 Method Not Allowed&lt;/h1&gt;
+        ///    &lt;p&gt;The target resource does not support this method&lt;/p&gt;
+        ///    &lt;hr&gt;
+        ///    &lt;p&gt;Simple HTTP server&lt;/p&gt;
+        ///&lt;/body&gt;
+        ///
+        ///&lt;/html&gt;.
+        /// </summary>
+        internal static string HttpServerResponsePage405 {
+            get {
+                return ResourceManager.GetString("HttpServerResponsePage405", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
+        ///
+        ///&lt;html lang=&quot;en&quot;&gt;
+        ///
+        ///&lt;head&gt;
+        ///    &lt;meta charset=&quot;utf-8&quot;&gt;
+        ///    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;
+        ///    &lt;style&gt;
+        ///        body {
+        ///            text-align: center;
+        ///        }
+        ///    &lt;/style&gt;
+        ///    &lt;title&gt;500 Internal Server Error&lt;/title&gt;
+        ///&lt;/head&gt;
+        ///
+        ///&lt;body&gt;
+        ///    &lt;h1&gt;500 Internal Server Error&lt;/h1&gt;
+        ///    &lt;p&gt;The server encountered an unexpected condition that prevented it from fulfilling the request&lt;/p&gt;
+        ///    &lt;hr&gt;
+        ///    &lt;p&gt;Simple HTTP server&lt;/p&gt;
+        ///&lt;/body&gt;
+        ///
+        ///&lt;/html&gt;.
+        /// </summary>
+        internal static string HttpServerResponsePage500 {
+            get {
+                return ResourceManager.GetString("HttpServerResponsePage500", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
+        ///
+        ///&lt;html lang=&quot;en&quot;&gt;
+        ///
+        ///&lt;head&gt;
+        ///    &lt;meta charset=&quot;utf-8&quot;&gt;
+        ///    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;
+        ///    &lt;style&gt;
+        ///        body {
+        ///            text-align: center;
+        ///        }
+        ///    &lt;/style&gt;
+        ///    &lt;title&gt;501 Not Implemented&lt;/title&gt;
+        ///&lt;/head&gt;
+        ///
+        ///&lt;body&gt;
+        ///    &lt;h1&gt;501 Not Implemented&lt;/h1&gt;
+        ///    &lt;p&gt;The server does not support the functionality required to fulfill the request&lt;/p&gt;
+        ///    &lt;hr&gt;
+        ///    &lt;p&gt;Simple HTTP server&lt;/p&gt;
+        ///&lt;/body&gt;
+        ///
+        ///&lt;/html&gt;.
+        /// </summary>
+        internal static string HttpServerResponsePage501 {
+            get {
+                return ResourceManager.GetString("HttpServerResponsePage501", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
+        ///
+        ///&lt;html lang=&quot;en&quot;&gt;
+        ///
+        ///&lt;head&gt;
+        ///    &lt;meta charset=&quot;utf-8&quot;&gt;
+        ///    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;
+        ///    &lt;style&gt;
+        ///        body {
+        ///            text-align: center;
+        ///        }
+        ///    &lt;/style&gt;
+        ///    &lt;title&gt;503 Service Unavailable&lt;/title&gt;
+        ///&lt;/head&gt;
+        ///
+        ///&lt;body&gt;
+        ///    &lt;h1&gt;503 Service Unavailable&lt;/h1&gt;
+        ///    &lt;p&gt;The server is temporarily unable to service your request&lt;/p&gt;
+        ///    &lt;hr&gt;
+        ///    &lt;p&gt;Simple HTTP server&lt;/p&gt;
+        ///&lt;/body&gt;
+        ///
+        ///&lt;/html&gt;.
+        /// </summary>
+        internal static string HttpServerResponsePage503 {
+            get {
+                return ResourceManager.GetString("HttpServerResponsePage503", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
+        ///
+        ///&lt;html lang=&quot;en&quot;&gt;
+        ///
+        ///&lt;head&gt;
+        ///    &lt;meta charset=&quot;utf-8&quot;&gt;
+        ///    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;
+        ///    &lt;style&gt;
+        ///        body {
+        ///            text-align: center;
+        ///        }
+        ///    &lt;/style&gt;
+        ///    &lt;title&gt;505 HTTP Version Not Supported&lt;/title&gt;
+        ///&lt;/head&gt;
+        ///
+        ///&lt;body&gt;
+        ///    &lt;h1&gt;505 HTTP Version Not Supported&lt;/h1&gt;
+        ///    &lt;p&gt;The HTTP version used in the request is not supported by the server&lt;/p&gt;
+        ///    &lt;hr&gt;
+        ///    &lt;p&gt;Simple HTTP server&lt;/p&gt;
+        ///&lt;/body&gt;
+        ///
+        ///&lt;/html&gt;.
+        /// </summary>
+        internal static string HttpServerResponsePage505 {
+            get {
+                return ResourceManager.GetString("HttpServerResponsePage505", resourceCulture);
             }
         }
     }

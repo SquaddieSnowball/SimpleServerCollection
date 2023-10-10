@@ -33,9 +33,9 @@ internal static class HttpResponseBuilder
     }
 
     /// <summary>
-    /// Creates a byte-based HTTP response from an instance of the HttpResponse class.
+    /// Creates a byte-based HTTP response from an instance of the <see cref="HttpResponse"/> class.
     /// </summary>
-    /// <param name="response">An instance of the HttpResponse class.</param>
+    /// <param name="response">An instance of the <see cref="HttpResponse"/> class.</param>
     /// <returns>A sequence of bytes containing the HTTP response.</returns>
     /// <exception cref="ArgumentNullException"></exception>
     public static IEnumerable<byte> Build(HttpResponse response)
@@ -60,8 +60,6 @@ internal static class HttpResponseBuilder
         if (string.IsNullOrEmpty(response.Body) is false)
             _ = responseStringBuilder.Append($"\n\n{response.Body}");
 
-        byte[] responseBytes = Encoding.ASCII.GetBytes(responseStringBuilder.ToString());
-
-        return responseBytes;
+        return Encoding.ASCII.GetBytes(responseStringBuilder.ToString());
     }
 }

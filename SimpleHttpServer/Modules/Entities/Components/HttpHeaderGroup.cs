@@ -5,9 +5,8 @@
 /// </summary>
 public enum HttpHeaderGroup
 {
-    General,
     Request,
     Response,
-    Entity,
-    Unknown
+    Representation,
+    Payload
 }
