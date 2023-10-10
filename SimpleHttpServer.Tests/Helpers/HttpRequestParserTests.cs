@@ -29,7 +29,7 @@ public sealed class HttpRequestParserTests
     }
 
     [TestMethod]
-    public void ParseFromBytes_IvalidTargetParameter_ThrowsArgumentException()
+    public void ParseFromBytes_IvalidQueryParameter_ThrowsArgumentException()
     {
         string request = "GET /?parameter HTTP/1.0";
         IEnumerable<byte> requestBytes = Encoding.ASCII.GetBytes(request);
@@ -54,7 +54,9 @@ public sealed class HttpRequestParserTests
     [DataRow("GET / HTTP/1.0")]
     [DataRow("GET /?parameter=value HTTP/1.0")]
     [DataRow("GET / HTTP/1.0\nHeader: value")]
+    [DataRow("GET /?parameter=value HTTP/1.0\nHeader: value")]
     [DataRow("GET / HTTP/1.0\n\nBody")]
+    [DataRow("GET /?parameter=value HTTP/1.0\n\nBody")]
     [DataRow("GET /?parameter=value HTTP/1.0\nHeader: value\n\nBody")]
     public void ParseFromBytes_MultipleRequests_DoesNotThrowAnException(string request)
     {

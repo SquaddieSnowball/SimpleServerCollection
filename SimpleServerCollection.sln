@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleHttpServer", "SimpleH
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{55A0B722-135C-4B7E-BED1-E85F8AE3BCC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleHttpServer.Tests", "SimpleHttpServer.Tests\SimpleHttpServer.Tests.csproj", "{B1CB98DB-2CD6-4DD6-818C-35D8B9B2CA5B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleHttpServer.Tests", "SimpleHttpServer.Tests\SimpleHttpServer.Tests.csproj", "{B1CB98DB-2CD6-4DD6-818C-35D8B9B2CA5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
