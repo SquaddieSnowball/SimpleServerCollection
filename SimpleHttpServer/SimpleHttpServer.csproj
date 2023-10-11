@@ -5,10 +5,10 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Product>SimpleHttpServer</Product>
-		<AssemblyVersion>1.0.0.0</AssemblyVersion>
-		<FileVersion>1.0.0.0</FileVersion>
+		<AssemblyVersion>2.0.0.0</AssemblyVersion>
+		<FileVersion>2.0.0.0</FileVersion>
 		<PackageId>SquaddieSnowball.SimpleServerCollection.SimpleHttpServer</PackageId>
-		<Version>1.0.0</Version>
+		<Version>2.0.0</Version>
 		<Authors>SquaddieSnowball</Authors>
 		<Company>SquaddieSnowball</Company>
 		<Title>Simple HTTP server</Title>
@@ -17,14 +17,21 @@
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/SquaddieSnowball/SimpleServerCollection</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<PackageReleaseNotes>
+			- Reworked endpoint mapping
+			- Added server events
+			- Minor changes to server log messages
+			- Changes in the internal code structure
+		</PackageReleaseNotes>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\SimpleTcpServer\SimpleTcpServer.csproj" />
+		<InternalsVisibleTo Include="$(MSBuildProjectName).Tests" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<InternalsVisibleTo Include="$(MSBuildProjectName).Tests" />
+		<ProjectReference Include="..\SimpleTcpServer\SimpleTcpServer.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
