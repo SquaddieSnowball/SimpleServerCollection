@@ -64,4 +64,4 @@ httpServer.Start();
 
 ## License
 
-Simple Server Collection is licensed under the [MIT license](LICENSE.TXT).
+Simple Server Collection is licensed under the [MIT license](LICENSE.txt).
