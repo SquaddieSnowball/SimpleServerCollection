@@ -1,0 +1,63 @@
+name: CD
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore
+
+      - name: Test
+        run: dotnet test --no-build
+
+  pack:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.x
+
+      - name: Pack
+        run: dotnet pack --configuration Release --output ${{ runner.temp }}/pkg
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v3
+        with:
+          name: packages
+          path: ${{ runner.temp }}/pkg
+
+  deploy:
+    needs: pack
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download packages
+        uses: actions/download-artifact@v3
+        with:
+          name: packages
+
+      - name: Publish (GitHub)
+        run: dotnet nuget push *.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+
+      - name: Publish (NuGet)
+        run: dotnet nuget push *.nupkg --api-key ${{ secrets.NUGET_TOKEN }} --source nuget.org
