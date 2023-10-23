@@ -40,7 +40,7 @@ jobs:
       - name: Pack
         run: dotnet pack --configuration Release --output SimpleServerCollection
 
-      - name: Upload
+      - name: Upload packages
         uses: actions/upload-artifact@v3
         with:
           name: packages
@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download
+      - name: Download packages
         uses: actions/download-artifact@v3
         with:
           name: packages
