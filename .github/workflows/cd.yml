@@ -38,13 +38,13 @@ jobs:
           dotnet-version: 6.x
 
       - name: Pack
-        run: dotnet pack --configuration Release --output SimpleServerCollection
+        run: dotnet pack --configuration Release --output ${{ runner.temp }}/pkg
 
       - name: Upload packages
         uses: actions/upload-artifact@v3
         with:
           name: packages
-          path: SimpleServerCollection/bin/Release/*.nupkg
+          path: ${{ runner.temp }}/pkg
 
   deploy:
     needs: pack
