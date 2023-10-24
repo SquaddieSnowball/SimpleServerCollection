@@ -5,25 +5,20 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Product>SimpleHttpServer</Product>
-		<AssemblyVersion>2.0.0.0</AssemblyVersion>
-		<FileVersion>2.0.0.0</FileVersion>
+		<AssemblyVersion>2.0.1.0</AssemblyVersion>
+		<FileVersion>2.0.1.0</FileVersion>
 		<PackageId>SquaddieSnowball.SimpleServerCollection.SimpleHttpServer</PackageId>
-		<Version>2.0.0</Version>
+		<Version>2.0.1</Version>
 		<Authors>SquaddieSnowball</Authors>
 		<Company>SquaddieSnowball</Company>
-		<Title>Simple HTTP server</Title>
-		<Description>This package is part of the "Simple server collection" project and includes an HTTP server.</Description>
+		<Title>Simple HTTP Server</Title>
+		<Description>This package is part of the "Simple Server Collection" project and includes an HTTP server.</Description>
 		<PackageTags>server;http</PackageTags>
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/SquaddieSnowball/SimpleServerCollection</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<PackageReleaseNotes>
-			- Reworked endpoint mapping
-			- Added server events
-			- Minor changes to server log messages
-			- Changes in the internal code structure
-		</PackageReleaseNotes>
+		<PackageReleaseNotes>- Added readme file</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
