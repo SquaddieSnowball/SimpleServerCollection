@@ -118,37 +118,37 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="HttpHeaderGroupDetails" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\HttpHeaderGroupDetails.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  <data name="HeaderGroupDetails" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\HeaderGroupDetails.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
-  <data name="HttpResponseStatusMessages" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\HttpResponseStatusMessages.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  <data name="ResponsePage400" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ResponsePages\ResponsePage400.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
-  <data name="HttpServerResponsePage400" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\HttpServerResponsePage400.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  <data name="ResponsePage401" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ResponsePages\ResponsePage401.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
-  <data name="HttpServerResponsePage401" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\HttpServerResponsePage401.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  <data name="ResponsePage403" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ResponsePages\ResponsePage403.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
-  <data name="HttpServerResponsePage403" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\HttpServerResponsePage403.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  <data name="ResponsePage404" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ResponsePages\ResponsePage404.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
-  <data name="HttpServerResponsePage404" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\HttpServerResponsePage404.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  <data name="ResponsePage405" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ResponsePages\ResponsePage405.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
-  <data name="HttpServerResponsePage405" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\HttpServerResponsePage405.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  <data name="ResponsePage500" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ResponsePages\ResponsePage500.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
-  <data name="HttpServerResponsePage500" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\HttpServerResponsePage500.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  <data name="ResponsePage501" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ResponsePages\ResponsePage501.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
-  <data name="HttpServerResponsePage501" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\HttpServerResponsePage501.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  <data name="ResponsePage503" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ResponsePages\ResponsePage503.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
-  <data name="HttpServerResponsePage503" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\HttpServerResponsePage503.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  <data name="ResponsePage505" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ResponsePages\ResponsePage505.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
-  <data name="HttpServerResponsePage505" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\HttpServerResponsePage505.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  <data name="ResponseStatusMessages" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ResponseStatusMessages.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

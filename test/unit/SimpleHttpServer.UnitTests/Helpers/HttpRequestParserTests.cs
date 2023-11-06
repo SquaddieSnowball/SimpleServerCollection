@@ -1,7 +1,7 @@
 ﻿using SimpleHttpServer.Modules.Helpers;
 using System.Text;
 
-namespace SimpleHttpServer.Tests.Helpers;
+namespace SimpleHttpServer.UnitTests.Helpers;
 
 [TestClass]
 public sealed class HttpRequestParserTests

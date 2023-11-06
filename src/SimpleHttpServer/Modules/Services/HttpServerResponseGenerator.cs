@@ -50,9 +50,9 @@ public sealed class HttpServerResponseGenerator
             new HttpHeader(
                 HttpHeaderGroup.Payload,
                 "Content-Length",
-                Properties.Resources.HttpServerResponsePage400.Length.ToString())
+                Properties.Resources.ResponsePage400.Length.ToString())
         }),
-        Properties.Resources.HttpServerResponsePage400);
+        Properties.Resources.ResponsePage400);
 
     /// <summary>
     /// Generates an "Unauthorized" HTTP response.
@@ -71,9 +71,9 @@ public sealed class HttpServerResponseGenerator
             new HttpHeader(
                 HttpHeaderGroup.Payload,
                 "Content-Length",
-                Properties.Resources.HttpServerResponsePage401.Length.ToString())
+                Properties.Resources.ResponsePage401.Length.ToString())
         }),
-        Properties.Resources.HttpServerResponsePage401);
+        Properties.Resources.ResponsePage401);
 
     /// <summary>
     /// Generates a "Forbidden" HTTP response.
@@ -92,9 +92,9 @@ public sealed class HttpServerResponseGenerator
             new HttpHeader(
                 HttpHeaderGroup.Payload,
                 "Content-Length",
-                Properties.Resources.HttpServerResponsePage403.Length.ToString())
+                Properties.Resources.ResponsePage403.Length.ToString())
         }),
-        Properties.Resources.HttpServerResponsePage403);
+        Properties.Resources.ResponsePage403);
 
     /// <summary>
     /// Generates a "Not Found" HTTP response.
@@ -113,9 +113,9 @@ public sealed class HttpServerResponseGenerator
             new HttpHeader(
                 HttpHeaderGroup.Payload,
                 "Content-Length",
-                Properties.Resources.HttpServerResponsePage404.Length.ToString())
+                Properties.Resources.ResponsePage404.Length.ToString())
         }),
-        Properties.Resources.HttpServerResponsePage404);
+        Properties.Resources.ResponsePage404);
 
     /// <summary>
     /// Generates a "Method Not Allowed" HTTP response.
@@ -135,13 +135,13 @@ public sealed class HttpServerResponseGenerator
             new HttpHeader(
                 HttpHeaderGroup.Payload,
                 "Content-Length",
-                Properties.Resources.HttpServerResponsePage405.Length.ToString()),
+                Properties.Resources.ResponsePage405.Length.ToString()),
             new HttpHeader(
                 HttpHeaderGroup.Response,
                 "Allow",
                 string.Join(", ", allowedMethods?.OrderBy(m => m) ?? Enumerable.Empty<HttpRequestMethod>()))
         }),
-        Properties.Resources.HttpServerResponsePage405);
+        Properties.Resources.ResponsePage405);
 
     /// <summary>
     /// Generates an "Internal Server Error" HTTP response.
@@ -160,9 +160,9 @@ public sealed class HttpServerResponseGenerator
             new HttpHeader(
                 HttpHeaderGroup.Payload,
                 "Content-Length",
-                Properties.Resources.HttpServerResponsePage500.Length.ToString())
+                Properties.Resources.ResponsePage500.Length.ToString())
         }),
-        Properties.Resources.HttpServerResponsePage500);
+        Properties.Resources.ResponsePage500);
 
     /// <summary>
     /// Generates a "Not Implemented" HTTP response.
@@ -181,9 +181,9 @@ public sealed class HttpServerResponseGenerator
             new HttpHeader(
                 HttpHeaderGroup.Payload,
                 "Content-Length",
-                Properties.Resources.HttpServerResponsePage501.Length.ToString())
+                Properties.Resources.ResponsePage501.Length.ToString())
         }),
-        Properties.Resources.HttpServerResponsePage501);
+        Properties.Resources.ResponsePage501);
 
     /// <summary>
     /// Generates a "Service Unavailable" HTTP response.
@@ -203,13 +203,13 @@ public sealed class HttpServerResponseGenerator
             new HttpHeader(
                 HttpHeaderGroup.Payload,
                 "Content-Length",
-                Properties.Resources.HttpServerResponsePage503.Length.ToString()),
+                Properties.Resources.ResponsePage503.Length.ToString()),
             new HttpHeader(
                 HttpHeaderGroup.Response,
                 "Retry-After",
                 retryDateTime.ToUniversalTime().ToString("R"))
         }),
-        Properties.Resources.HttpServerResponsePage503);
+        Properties.Resources.ResponsePage503);
 
     /// <summary>
     /// Generates an "HTTP Version Not Supported" HTTP response.
@@ -227,7 +227,7 @@ public sealed class HttpServerResponseGenerator
             new HttpHeader(
                 HttpHeaderGroup.Payload,
                 "Content-Length",
-                Properties.Resources.HttpServerResponsePage505.Length.ToString())
+                Properties.Resources.ResponsePage505.Length.ToString())
         }),
-        Properties.Resources.HttpServerResponsePage505);
+        Properties.Resources.ResponsePage505);
 }

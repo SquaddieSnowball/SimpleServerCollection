@@ -16,7 +16,7 @@ internal static class HttpResponseBuilder
         try
         {
             string[] statusCodeMessageStrings =
-                Properties.Resources.HttpResponseStatusMessages.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
+                Properties.Resources.ResponseStatusMessages.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
 
             foreach (string statusCodeMessageString in statusCodeMessageStrings)
             {

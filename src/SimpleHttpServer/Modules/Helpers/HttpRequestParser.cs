@@ -21,7 +21,7 @@ internal static class HttpRequestParser
         try
         {
             string[] headerGroupParametersStrings =
-                Properties.Resources.HttpHeaderGroupDetails.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
+                Properties.Resources.HeaderGroupDetails.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
 
             foreach (string headerGroupParametersString in headerGroupParametersStrings)
             {
