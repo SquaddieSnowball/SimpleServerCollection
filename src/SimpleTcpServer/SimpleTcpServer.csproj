@@ -5,10 +5,10 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Product>SimpleTcpServer</Product>
-		<AssemblyVersion>1.1.1.0</AssemblyVersion>
-		<FileVersion>1.1.1.0</FileVersion>
+		<AssemblyVersion>1.2.0.0</AssemblyVersion>
+		<FileVersion>1.2.0.0</FileVersion>
 		<PackageId>SquaddieSnowball.SimpleServerCollection.SimpleTcpServer</PackageId>
-		<Version>1.1.1</Version>
+		<Version>1.2.0</Version>
 		<Authors>SquaddieSnowball</Authors>
 		<Company>SquaddieSnowball</Company>
 		<Title>Simple TCP Server</Title>
@@ -18,7 +18,7 @@
 		<RepositoryUrl>https://github.com/SquaddieSnowball/SimpleServerCollection</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<PackageReleaseNotes>- Added readme file</PackageReleaseNotes>
+		<PackageReleaseNotes>- Code structure changes</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
