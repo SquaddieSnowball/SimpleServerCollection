@@ -23,12 +23,12 @@ Available options:
 **HTTP server**:
 
 - `Name` - server name;
-- `TraceEnabled` - value indicating whether the HTTP "TRACE" method is enabled on the server.
+- `TraceEnabled` - value indicating whether the HTTP `TRACE` method is enabled on the server.
 
 > [!IMPORTANT]
 > Options marked with `*` are required.
 
-Add the required services to the container using the `AddHttpServer` method, map the HTTP "GET" method and start the server:
+Add the required services to the container using the `AddHttpServer` method, map the HTTP `GET` method and start the server:
 
 ```c#
 using Microsoft.Extensions.DependencyInjection;
