@@ -1,4 +1,4 @@
-﻿namespace SimpleTcpServer.Modules.Entities;
+﻿namespace SimpleTcpServer.Entities;
 
 /// <summary>
 /// Represents a TCP response.
@@ -12,7 +12,7 @@ public record class TcpResponse(IEnumerable<byte> Body)
     public IEnumerable<byte> Body { get; set; } = Body;
 
     /// <summary>
-    /// A value that determines whether the connection should be kept alive after the request has been processed.
+    /// A value that determines whether the connection should be kept alive after the request has been handled.
     /// </summary>
     public bool KeepConnectionAlive { get; set; }
 }

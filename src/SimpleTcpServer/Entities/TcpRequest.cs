@@ -1,4 +1,4 @@
-﻿namespace SimpleTcpServer.Modules.Entities;
+﻿namespace SimpleTcpServer.Entities;
 
 /// <summary>
 /// Represents a TCP request.
