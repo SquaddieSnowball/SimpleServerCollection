@@ -29,28 +29,90 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\SimpleTcpServer\SimpleTcpServer.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="README.md">
+		<None Include="..\..\docs\http\README.md">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Update="Properties\Resources.Designer.cs">
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Options" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SimpleTcpServer\SimpleTcpServer.csproj" />
+		<ProjectReference Include="..\Validation\Validation.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Resources\Entities\Components\HttpHeader\HttpHeaderGroupDetails.Designer.cs">
 			<DesignTime>True</DesignTime>
 			<AutoGen>True</AutoGen>
-			<DependentUpon>Resources.resx</DependentUpon>
+			<DependentUpon>HttpHeaderGroupDetails.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\Entities\HttpEndpoint\ExceptionMessages\HttpEndpointExceptionMessages.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>HttpEndpointExceptionMessages.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\Services\HttpServerResponseGenerator\Pages\HttpServerResponseGeneratorPages.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>HttpServerResponseGeneratorPages.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\Entities\HttpResponse\Details\HttpResponseDetails.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>HttpResponseDetails.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\Entities\HttpResponse\HttpResponseStatusMessages.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>HttpResponseStatusMessages.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\Services\HttpRequestParser\ExceptionMessages\HttpRequestParserExceptionMessages.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>HttpRequestParserExceptionMessages.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\Services\HttpServerResponseGenerator\ExceptionMessages\HttpServerResponseGeneratorExceptionMessages.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>HttpServerResponseGeneratorExceptionMessages.resx</DependentUpon>
 		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Update="Properties\Resources.resx">
+		<EmbeddedResource Update="Resources\Entities\Components\HttpHeader\HttpHeaderGroupDetails.resx">
 			<Generator>ResXFileCodeGenerator</Generator>
-			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+			<LastGenOutput>HttpHeaderGroupDetails.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Entities\HttpEndpoint\ExceptionMessages\HttpEndpointExceptionMessages.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>HttpEndpointExceptionMessages.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Services\HttpServerResponseGenerator\Pages\HttpServerResponseGeneratorPages.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>HttpServerResponseGeneratorPages.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Entities\HttpResponse\Details\HttpResponseDetails.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>HttpResponseDetails.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Entities\HttpResponse\HttpResponseStatusMessages.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>HttpResponseStatusMessages.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Services\HttpRequestParser\ExceptionMessages\HttpRequestParserExceptionMessages.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>HttpRequestParserExceptionMessages.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Services\HttpServerResponseGenerator\ExceptionMessages\HttpServerResponseGeneratorExceptionMessages.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>HttpServerResponseGeneratorExceptionMessages.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 	</ItemGroup>
 

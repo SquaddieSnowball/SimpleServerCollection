@@ -1,2 +1,0 @@
-﻿Representation: Content-Type, Content-Encoding, Content-Language, Content-Location
-Payload: Content-Length, Content-Range, Trailer, Transfer-Encoding
