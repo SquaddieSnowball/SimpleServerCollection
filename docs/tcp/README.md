@@ -18,7 +18,6 @@ Available options:
 - `RequestBufferSize` - size of the byte array used as a buffer to store the request;
 - `RequestReadTimeout` - timeout (in milliseconds) for reading request data.
 
-> [!IMPORTANT]
 > Options marked with `*` are required.
 
 Add the required services to the container using the `AddTcpServer` method, configure the request handler and start the server:
@@ -44,4 +43,4 @@ await host.StartAsync();
 
 ## License
 
-Simple Server Collection is licensed under the [MIT license](../../LICENSE.txt).
+**Simple Server Collection** is licensed under the MIT license.
