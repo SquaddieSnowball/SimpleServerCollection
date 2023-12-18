@@ -5,20 +5,20 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Product>SimpleTcpServer</Product>
-		<AssemblyVersion>2.0.0.0</AssemblyVersion>
-		<FileVersion>2.0.0.0</FileVersion>
+		<AssemblyVersion>2.0.1.0</AssemblyVersion>
+		<FileVersion>2.0.1.0</FileVersion>
 		<PackageId>SquaddieSnowball.SimpleServerCollection.SimpleTcpServer</PackageId>
-		<Version>2.0.0</Version>
+		<Version>2.0.1</Version>
 		<Authors>SquaddieSnowball</Authors>
 		<Company>SquaddieSnowball</Company>
 		<Title>Simple TCP Server</Title>
-		<Description>This package is part of the "Simple Server Collection" project and includes a TCP server.</Description>
+		<Description>Lightweight TCP server with basic functionality.</Description>
 		<PackageTags>server;tcp</PackageTags>
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/SquaddieSnowball/SimpleServerCollection</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<PackageReleaseNotes>- The server has been reworked to support a generic host</PackageReleaseNotes>
+		<PackageReleaseNotes>- Fixed missing validation</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
