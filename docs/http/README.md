@@ -11,21 +11,18 @@ Configure the server in the `appsettings.json` file:
 }
 ```
 
-Available options:
-
-**TCP server**:
+Available TCP server options:
 
 - `IpAddress*` - string representing the local IP address;
 - `Port*` - port on which requests will be listened;
 - `RequestBufferSize` - size of the byte array used as a buffer to store the request;
 - `RequestReadTimeout` - timeout (in milliseconds) for reading request data.
 
-**HTTP server**:
+Available HTTP server options:
 
 - `Name` - server name;
 - `TraceEnabled` - value indicating whether the HTTP `TRACE` method is enabled on the server.
 
-> [!IMPORTANT]
 > Options marked with `*` are required.
 
 Add the required services to the container using the `AddHttpServer` method, map the HTTP `GET` method and start the server:
@@ -52,4 +49,4 @@ await host.StartAsync();
 
 ## License
 
-Simple Server Collection is licensed under the [MIT license](../../LICENSE.txt).
+**Simple Server Collection** is licensed under the MIT license.
