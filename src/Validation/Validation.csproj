@@ -4,6 +4,21 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<Product>SimpleServerCollectionValidation</Product>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<FileVersion>1.0.0.0</FileVersion>
+		<PackageId>SquaddieSnowball.SimpleServerCollection.Validation</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>SquaddieSnowball</Authors>
+		<Company>SquaddieSnowball</Company>
+		<Title>Simple Server Collection Validation</Title>
+		<Description>Validation for "Simple Server Collection".</Description>
+		<PackageTags>validation</PackageTags>
+		<RepositoryType>git</RepositoryType>
+		<RepositoryUrl>https://github.com/SquaddieSnowball/SimpleServerCollection</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<PackageReleaseNotes>- Initial release</PackageReleaseNotes>
 	</PropertyGroup>
 
 	<ItemGroup>
