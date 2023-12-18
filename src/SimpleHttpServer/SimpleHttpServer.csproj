@@ -5,20 +5,20 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Product>SimpleHttpServer</Product>
-		<AssemblyVersion>3.0.0.0</AssemblyVersion>
-		<FileVersion>3.0.0.0</FileVersion>
+		<AssemblyVersion>3.0.1.0</AssemblyVersion>
+		<FileVersion>3.0.1.0</FileVersion>
 		<PackageId>SquaddieSnowball.SimpleServerCollection.SimpleHttpServer</PackageId>
-		<Version>3.0.0</Version>
+		<Version>3.0.1</Version>
 		<Authors>SquaddieSnowball</Authors>
 		<Company>SquaddieSnowball</Company>
 		<Title>Simple HTTP Server</Title>
-		<Description>This package is part of the "Simple Server Collection" project and includes an HTTP server.</Description>
+		<Description>Lightweight HTTP server with basic functionality.</Description>
 		<PackageTags>server;http</PackageTags>
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/SquaddieSnowball/SimpleServerCollection</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<PackageReleaseNotes>- The server has been reworked to support a generic host</PackageReleaseNotes>
+		<PackageReleaseNotes>- Fixed missing validation</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
